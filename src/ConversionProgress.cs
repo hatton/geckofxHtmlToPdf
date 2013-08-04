@@ -38,9 +38,39 @@ namespace geckofxHtmlToPdf
 			var printSettings = service.GetNewPrintSettingsAttribute();
 
 			printSettings.SetToFileNameAttribute(_pathToTempPdf);
-			printSettings.SetPrintSilentAttribute(true);
-			printSettings.SetPaperNameAttribute("a4");
-			printSettings.SetDownloadFontsAttribute(true);
+			printSettings.SetPrintSilentAttribute(true);//don't show a printer settings dialog
+			printSettings.SetShowPrintProgressAttribute(!_conversionOrder.ShowProgressDialog);
+			
+			if (_conversionOrder.PageHeightInMillimeters > 0)
+			{
+				printSettings.SetPaperHeightAttribute(_conversionOrder.PageHeightInMillimeters);
+				printSettings.SetPaperWidthAttribute(_conversionOrder.PageWidthInMillimeters);
+				printSettings.SetPaperSizeUnitAttribute(1);//0=in, >0 = mm
+			}
+			else
+			{
+				printSettings.SetPaperNameAttribute(_conversionOrder.PageSizeName);
+			}
+			//this seems to be in inches, and doesn't have a unit-setter (unlike the paper size ones)
+			const double kMillimetersPerInch = 25; //TODO what is it, exactly?
+			printSettings.SetMarginTopAttribute(_conversionOrder.TopMarginInMillimeters/kMillimetersPerInch);
+			printSettings.SetMarginBottomAttribute(_conversionOrder.BottomMarginInMillimeters / kMillimetersPerInch);
+			printSettings.SetMarginLeftAttribute(_conversionOrder.LeftMarginInMillimeters / kMillimetersPerInch);
+			printSettings.SetMarginRightAttribute(_conversionOrder.RightMarginInMillimeters / kMillimetersPerInch);
+			
+
+			printSettings.SetDownloadFontsAttribute(true);//review: what's this for?
+			printSettings.SetOrientationAttribute(_conversionOrder.Landscape ? 1 : 0);
+			printSettings.SetHeaderStrCenterAttribute("");
+			printSettings.SetHeaderStrLeftAttribute("");
+			printSettings.SetHeaderStrRightAttribute("");
+			printSettings.SetFooterStrRightAttribute("");
+			printSettings.SetFooterStrLeftAttribute("");
+			printSettings.SetFooterStrCenterAttribute("");
+
+			//TODO: doesn't see to do anything
+			printSettings.SetScalingAttribute(_conversionOrder.Zoom);
+			;
 			printSettings.SetOutputFormatAttribute(2); // 2 == kOutputFormatPDF
 
 			_statusLabel.Text = "Making PDF..";

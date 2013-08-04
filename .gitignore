@@ -3,3 +3,4 @@ output
 *.ncrunchsolution
 packages
 obj
+*.tmp

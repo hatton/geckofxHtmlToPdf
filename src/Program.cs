@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using CommandLine;
 using Gecko;
 
 namespace geckofxHtmlToPdf
@@ -19,10 +13,12 @@ namespace geckofxHtmlToPdf
 			var conversionOrder = new ConversionOrder();
 
 			CommandLine.Parser.Default.ParseArguments(args, conversionOrder);
-
+			
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 
+			//for developers, this will find xulrunner in a directory called "distfiles"
+			//when installed, it will find it in the same directory as the exe.
 			string xulrunnerPath = GetDirectoryDistributedWithApplication(false,"xulrunner");
 			Gecko.Xpcom.Initialize(xulrunnerPath);
 
@@ -34,8 +30,6 @@ namespace geckofxHtmlToPdf
 
 			//Browser requires an Application event loop. This could eventually be a progress window or be invisible
 			Application.Run(new ConversionProgress(conversionOrder));
-
-
 		}
 
 		/// <summary>
@@ -123,22 +117,4 @@ namespace geckofxHtmlToPdf
 			}
 		}
 	}
-
-	/// <summary>
-	/// a goal here is to follow the wkhtmltopdf parameters where it makes sense, to ease people trying this out:
-	/// http://madalgo.au.dk/~jakobt/wkhtmltoxdoc/wkhtmltopdf-0.9.9-doc.html
-	/// </summary>
-	public class ConversionOrder
-	{
-//		[Option(DefaultValue = true, Required = true, HelpText = "Path to input html")]
-		[CommandLine.ValueOption(0)]
-		public string InputPath { get; set; }
-//		[Option(DefaultValue = true, Required = true, HelpText = "Path to output pdf")]
-		[CommandLine.ValueOption(1)]
-		public string OutputPath { get; set; }
-
-		[Option("graphite",DefaultValue = false, HelpText = "Enable SIL Graphite smart font rendering")]
-		public bool EnableGraphite { get; set; }
-	}
-
 }
