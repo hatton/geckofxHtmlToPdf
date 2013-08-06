@@ -45,34 +45,38 @@ namespace geckofxHtmlToPdf
 		[Option('R', "margin-right", DefaultValue = "10", HelpText = "Set the page right margin")]
 		public string RightMargin { get; set; }
 
-
+		private double GetMillimeters(string distance)
+		{
+			//TODO: convert to mm. For now, just strips "mm"
+			return double.Parse(distance.Replace("mm", ""));
+		}
 		public double TopMarginInMillimeters
 		{
-			get { return Double.Parse(TopMargin); }
+			get { return GetMillimeters(TopMargin); }
 			set { TopMargin = value.ToString(); }
 		}
 		public double BottomMarginInMillimeters
 		{
-			get { return Double.Parse(BottomMargin); }
+			get { return GetMillimeters(BottomMargin); }
 			set { BottomMargin = value.ToString(); }
 		}
 
 
 		public double LeftMarginInMillimeters
 		{
-			get { return Double.Parse(LeftMargin); }
+			get { return GetMillimeters(LeftMargin); }
 			set { LeftMargin = value.ToString(); }
 		}
 		public double RightMarginInMillimeters
 		{
-			get { return Double.Parse(RightMargin); }
+			get { return GetMillimeters(RightMargin); }
 			set { RightMargin = value.ToString(); }
 		}
 
 		[Option("zoom", DefaultValue=1.0, HelpText = "Zoom/scaling factor (default 1.0)")]
 		public double Zoom { get; set; }
 
-		[Option('s', DefaultValue = "A4", HelpText = "Set paper size to: A4, Letter, etc.  (default A4)",
+		[Option('s',"page-size", DefaultValue = "A4", HelpText = "Set paper size to: A4, Letter, etc.  (default A4)",
 			//LongName = "page-size", 
 			MutuallyExclusiveSet="PageSize")]
 		public string PageSizeName { get; set; }
@@ -93,7 +97,7 @@ namespace geckofxHtmlToPdf
 				}
 				else
 				{
-					return double.Parse(PageHeight);
+					return GetMillimeters(PageHeight);
 				}	
 			}//todo: units?
 			set { PageHeight = value.ToString();}//todo: units?
@@ -108,7 +112,7 @@ namespace geckofxHtmlToPdf
 				}
 				else
 				{
-					return double.Parse(PageWidth);
+					return GetMillimeters(PageWidth);
 				}
 			} //todo: units?
 			set { PageWidth = value.ToString(); }//todo: units?

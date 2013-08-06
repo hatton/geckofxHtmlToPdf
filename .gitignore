@@ -4,3 +4,4 @@ output
 packages
 obj
 *.tmp
+test/*.pdf
