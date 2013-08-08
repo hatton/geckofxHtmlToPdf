@@ -119,6 +119,11 @@ namespace geckofxHtmlToPdf
 		}
 
 		[Option('q', "quiet", DefaultValue = false, HelpText = "Don't show the progress dialog")]
-		public bool ShowProgressDialog { get; set; }
+		public bool NoUIMode { get; set; }
+
+		public bool IsHTTP
+		{
+			get { return InputPath.ToLower().StartsWith("http"); }
+		}
 	}
 }

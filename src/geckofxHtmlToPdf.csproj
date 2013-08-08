@@ -63,6 +63,12 @@
     <Compile Include="ConversionProgress.Designer.cs">
       <DependentUpon>ConversionProgress.cs</DependentUpon>
     </Compile>
+    <Compile Include="GeckofxHtmlToPDFComponent.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="GeckofxHtmlToPDFComponent.Designer.cs">
+      <DependentUpon>GeckofxHtmlToPDFComponent.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -73,6 +79,9 @@
   <ItemGroup>
     <EmbeddedResource Include="ConversionProgress.resx">
       <DependentUpon>ConversionProgress.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GeckofxHtmlToPDFComponent.resx">
+      <DependentUpon>GeckofxHtmlToPDFComponent.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

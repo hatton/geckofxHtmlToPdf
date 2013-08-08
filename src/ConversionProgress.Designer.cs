@@ -29,28 +29,31 @@
 		private void InitializeComponent()
 		{
 			this.components = new System.ComponentModel.Container();
-			this._checkForPdfFinishedTimer = new System.Windows.Forms.Timer(this.components);
-			this._checkForBrowserNavigatedTimer = new System.Windows.Forms.Timer(this.components);
 			this._statusLabel = new System.Windows.Forms.Label();
+			this._progressBar = new System.Windows.Forms.ProgressBar();
+			this._pdfMaker = new geckofxHtmlToPdf.GeckofxHtmlToPdfComponent(this.components);
 			this.SuspendLayout();
-			// 
-			// _checkForPdfFinishedTimer
-			// 
-			this._checkForPdfFinishedTimer.Tick += new System.EventHandler(this.OnCheckForPdfFinishedTimer_Tick);
-			// 
-			// _checkForBrowserNavigatedTimer
-			// 
-			this._checkForBrowserNavigatedTimer.Interval = 3000;
-			this._checkForBrowserNavigatedTimer.Tick += new System.EventHandler(this.OnCheckForBrowserNavigatedTimerTick);
 			// 
 			// _statusLabel
 			// 
 			this._statusLabel.AutoSize = true;
-			this._statusLabel.Location = new System.Drawing.Point(36, 41);
+			this._statusLabel.Location = new System.Drawing.Point(27, 19);
 			this._statusLabel.Name = "_statusLabel";
 			this._statusLabel.Size = new System.Drawing.Size(54, 13);
 			this._statusLabel.TabIndex = 0;
 			this._statusLabel.Text = "Loading...";
+			// 
+			// _progressBar
+			// 
+			this._progressBar.Location = new System.Drawing.Point(30, 45);
+			this._progressBar.Name = "_progressBar";
+			this._progressBar.Size = new System.Drawing.Size(280, 23);
+			this._progressBar.TabIndex = 1;
+			// 
+			// geckofxHtmlToPdfComponent1
+			// 
+			this._pdfMaker.Finished += new System.EventHandler(this.ConversionProgress_Load);
+			this._pdfMaker.StatusChanged += new System.EventHandler<geckofxHtmlToPdf.PdfMakingStatus>(this.OnPdfMakerStatusChanged);
 			// 
 			// ConversionProgress
 			// 
@@ -58,6 +61,7 @@
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(343, 100);
 			this.ControlBox = false;
+			this.Controls.Add(this._progressBar);
 			this.Controls.Add(this._statusLabel);
 			this.Name = "ConversionProgress";
 			this.Text = "GeckoFxHtmlToPdf";
@@ -69,8 +73,8 @@
 
 		#endregion
 
-		private System.Windows.Forms.Timer _checkForPdfFinishedTimer;
-		private System.Windows.Forms.Timer _checkForBrowserNavigatedTimer;
 		private System.Windows.Forms.Label _statusLabel;
+		private System.Windows.Forms.ProgressBar _progressBar;
+		private GeckofxHtmlToPdfComponent _pdfMaker;
 	}
 }

@@ -8,11 +8,12 @@ using Gecko;
 
 namespace geckofxHtmlToPdf
 {
+	/// <summary>
+	/// The "Program" is used when this is invoked via command line, rather than embedded in a winforms app.
+	/// </summary>
 	internal class Program
 	{
 		private static int _returnCode;
-
-
 
 		[System.Runtime.InteropServices.DllImportAttribute("kernel32.dll", EntryPoint = "AttachConsole")]
 		static extern bool AttachConsole(int dwProcessId);
@@ -31,7 +32,8 @@ namespace geckofxHtmlToPdf
 
 				return 1;
 			}
-			if(!File.Exists(conversionOrder.InputPath))
+
+			if(!conversionOrder.IsHTTP && !File.Exists(conversionOrder.InputPath))
 			{
 				Console.Error.WriteLine(
 					"GeckofxHtmlToPDF could not locate the input file: " + conversionOrder.InputPath);
