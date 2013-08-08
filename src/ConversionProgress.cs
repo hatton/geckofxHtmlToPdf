@@ -25,11 +25,15 @@ namespace geckofxHtmlToPdf
 
 		private void ConversionProgress_Load(object sender, EventArgs e)
 		{
-			_pdfMaker.Finished += (o, args) => Close();
 			_pdfMaker.Start(_conversionOrder);
 		}
 
-		private void OnPdfMakerStatusChanged(object sender, PdfMakingStatus pdfMakingStatus)
+		void OnPdfMaker_Finished(object sender, EventArgs e)
+		{
+			Close();
+		}
+
+		private void OnPdfMaker_StatusChanged(object sender, PdfMakingStatus pdfMakingStatus)
 		{
 			_statusLabel.Text = pdfMakingStatus.statusLabel;
 			_progressBar.Value = pdfMakingStatus.percentage;

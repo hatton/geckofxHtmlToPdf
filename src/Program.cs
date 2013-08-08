@@ -57,9 +57,6 @@ namespace geckofxHtmlToPdf
 			if (conversionOrder.EnableGraphite)
 				GeckoPreferences.User["gfx.font_rendering.graphite.enabled"] = true;
 
-			//without this, we get invisible (white?) text on some machines
-			Gecko.GeckoPreferences.User["gfx.direct2d.disabled"] = true;
-
 			//Browser requires an Application event loop. This could eventually be a progress window or be invisible
 			Application.Run(new ConversionProgress(conversionOrder));
 			return _returnCode;

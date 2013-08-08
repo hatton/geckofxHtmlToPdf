@@ -50,10 +50,10 @@
 			this._progressBar.Size = new System.Drawing.Size(280, 23);
 			this._progressBar.TabIndex = 1;
 			// 
-			// geckofxHtmlToPdfComponent1
+			// _pdfMaker
 			// 
-			this._pdfMaker.Finished += new System.EventHandler(this.ConversionProgress_Load);
-			this._pdfMaker.StatusChanged += new System.EventHandler<geckofxHtmlToPdf.PdfMakingStatus>(this.OnPdfMakerStatusChanged);
+			this._pdfMaker.Finished += new System.EventHandler(this.OnPdfMaker_Finished);
+			this._pdfMaker.StatusChanged += new System.EventHandler<geckofxHtmlToPdf.PdfMakingStatus>(this.OnPdfMaker_StatusChanged);
 			// 
 			// ConversionProgress
 			// 
