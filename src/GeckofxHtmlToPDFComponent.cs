@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using Gecko;
 
 namespace geckofxHtmlToPdf
@@ -39,18 +40,38 @@ namespace geckofxHtmlToPdf
 			InitializeComponent();
 		}
 
+		/// <summary>
+		/// The path to the XulRunner directory. Defaults to the same directory as this assembly, or a "DistFiles" directory if
+		/// the code is being run from the geckofxHtmlToPdf visual studio solution.
+		/// </summary>
+		public string XulRunnerPath { get; set; }
+		
+		/// <summary>
+		/// On the application event thread, work on creating the pdf. Will raise the StatusChanged and Finished events
+		/// </summary>
+		/// <param name="conversionOrder"></param>
 		public void Start(ConversionOrder conversionOrder)
 		{
+			//for developers, this will find xulrunner in a directory called "distfiles"
+			//when installed, it will find it in the same directory as the exe.
+			if(null==XulRunnerPath)
+				XulRunnerPath = GetDirectoryDistributedWithApplication(false, "xulrunner");
+
+			Gecko.Xpcom.Initialize(XulRunnerPath);
+
 			//without this, we get invisible (white?) text on some machines
 			Gecko.GeckoPreferences.User["gfx.direct2d.disabled"] = true;
+			if (conversionOrder.EnableGraphite)
+				GeckoPreferences.User["gfx.font_rendering.graphite.enabled"] = true;
 
 			_conversionOrder = conversionOrder;
 			_browser = new GeckoWebBrowser();
 			this.components.Add(_browser);//so it gets disposed when we are
 			_browser.ConsoleMessage += OnBrowserConsoleMessage;
-			_pathToTempPdf = Path.GetTempFileName() + ".pdf"; //<-- TODO this makes an extra file
+			var tempFileName = Path.GetTempFileName();
+			File.Delete(tempFileName);
+			_pathToTempPdf = tempFileName + ".pdf"; 
 			File.Delete(_conversionOrder.OutputPath);
-			//File.Delete(_pathToTempPdf);
 			_checkForBrowserNavigatedTimer.Enabled = true;
 			Status = "Loading Html...";
 			_browser.Navigate(_conversionOrder.InputPath);
@@ -235,6 +256,94 @@ namespace geckofxHtmlToPdf
 		{
 		}
 
+		#endregion
+
+		#region FindingXulRunner
+
+		/// <summary>
+		/// Find a file which, on a development machine, lives in [solution]/DistFiles/[subPath],
+		/// and when installed, lives in 
+		/// [applicationFolder]/[subPath1]/[subPathN]
+		/// </summary>
+		/// <example>GetFileDistributedWithApplication("info", "releaseNotes.htm");</example>
+		public static string GetDirectoryDistributedWithApplication(bool optional, params string[] partsOfTheSubPath)
+		{
+			var path = DirectoryOfApplicationOrSolution;
+			foreach (var part in partsOfTheSubPath)
+			{
+				path = System.IO.Path.Combine(path, part);
+			}
+			if (Directory.Exists(path))
+				return path;
+
+			//try distfiles
+			path = DirectoryOfApplicationOrSolution;
+			path = Path.Combine(path, "distFiles");
+			foreach (var part in partsOfTheSubPath)
+			{
+				path = System.IO.Path.Combine(path, part);
+			}
+			if (Directory.Exists(path))
+				return path;
+
+			//try src (e.g. Bloom keeps its javascript under source directory (and in distfiles only when installed)
+			path = DirectoryOfApplicationOrSolution;
+			path = Path.Combine(path, "src");
+			foreach (var part in partsOfTheSubPath)
+			{
+				path = System.IO.Path.Combine(path, part);
+			}
+
+			if (optional && !Directory.Exists(path))
+				return null;
+
+			if (!Directory.Exists(path))
+				throw new ApplicationException("Could not locate " + path);
+			return path;
+		}
+
+		/// <summary>
+		/// Gives the directory of either the project folder (if running from visual studio), or
+		/// the installation folder.  Helpful for finding templates and things; by using this,
+		/// you don't have to copy those files into the build directory during development.
+		/// It assumes your build directory has "output" as part of its path.
+		/// </summary>
+		/// <returns></returns>
+		public static string DirectoryOfApplicationOrSolution
+		{
+			get
+			{
+				string path = DirectoryOfTheApplicationExecutable;
+				char sep = Path.DirectorySeparatorChar;
+				int i = path.ToLower().LastIndexOf(sep + "output" + sep);
+
+				if (i > -1)
+				{
+					path = path.Substring(0, i + 1);
+				}
+				return path;
+			}
+		}
+
+		public static string DirectoryOfTheApplicationExecutable
+		{
+			get
+			{
+				string path;
+				bool unitTesting = Assembly.GetEntryAssembly() == null;
+				if (unitTesting)
+				{
+					path = new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath;
+					path = Uri.UnescapeDataString(path);
+				}
+				else
+				{
+					var assembly = Assembly.GetEntryAssembly();
+					path = assembly.Location;
+				}
+				return Directory.GetParent(path).FullName;
+			}
+		}
 		#endregion
 	}
 

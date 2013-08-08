@@ -1,13 +1,28 @@
 geckofxHtmlToPdf
 ================
 
-Command Line and (eventually) .net dll for making pdfs from html, using the gecko engine, as wrapped by [geckofx](https://bitbucket.org/geckofx "geckofx").
+Command line and .net component for making pdfs from html, using the gecko engine, as wrapped by [geckofx](https://bitbucket.org/geckofx "geckofx").
 
-This project is just getting started, it's barely working. Currently it always shows a little window telling you its working.
+This project is just getting started, consider it alpha quality.
 
-Current command line is just
+Basic command line:
 
     geckofxhtmltopdf inputpath outputpath
+
+Other options:
+
+    --graphite
+	--margin-top (-T) e.g. -T 2.5
+	--margin-bottom (-B)
+	--margin-left (-L)
+	--margin-right (-R)
+    --orientation (-o) e.g. "landscape"
+	--page-size (-s) e.g. -s A5
+	--page-width
+	--page-height
+    --quiet (-q)
+
+NB: Currently the only units that are supported are millimeters.
 
 ##Requirements##
 
@@ -24,14 +39,11 @@ Unzip the XulRunner directory into the distfiles directory, so that you have dis
 
 ##RoadMap##
 
-- Get rid of the current header that gecko adds
+- Add a winforms component that can be used to make PDFs easily from a winforms app without running the command line. (in progress)
 
-- Add command line parameters for:
- -  page size
- -  orientation
+- Add command line parameter for:
  -  media
- -  perhaps others, following the [wkhtmltopdf](http://code.google.com/p/wkhtmltopdf/ "wkhtmltopdf") conventions
+ 
+Pull requests for  others arguments are welcome. Please follow the [wkhtmltopdf](http://code.google.com/p/wkhtmltopdf/ "wkhtmltopdf") conventions.
 
-
-- Add a winforms component that can be used to make PDFs easily from a winforms app without running the command line.
 
