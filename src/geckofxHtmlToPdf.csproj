@@ -38,8 +38,8 @@
     </StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CommandLine">
-      <HintPath>..\packages\CommandLineParser.1.9.71\lib\net40\CommandLine.dll</HintPath>
+    <Reference Include="Args">
+      <HintPath>..\packages\Args.1.1.1\lib\Net40\Args.dll</HintPath>
     </Reference>
     <Reference Include="Geckofx-Core">
       <HintPath>..\lib\Geckofx-Core.dll</HintPath>

@@ -40,7 +40,8 @@ Unzip the XulRunner directory into the distfiles directory, so that you have dis
 
 ##RoadMap##
 
-- Add a winforms component that can be used to make PDFs easily from a winforms app without running the command line. (It's there and usable but hit some snages and so suspendend for now; see notes in the code if you want to finish this up.)
+
+- Add a winforms component that can be used to make PDFs easily from a winforms app without running the command line. (It's there and usable but hit some snags and so suspendend for now; see notes in the code if you want to finish this up.)
 
 - Add command line parameter for:
  -  media

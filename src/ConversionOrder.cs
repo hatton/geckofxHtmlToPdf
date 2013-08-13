@@ -1,5 +1,5 @@
 ﻿using System;
-using CommandLine;
+using System.ComponentModel;
 
 namespace GeckofxHtmlToPdf
 {
@@ -13,36 +13,39 @@ namespace GeckofxHtmlToPdf
 	/// </summary>
 	public class ConversionOrder
 	{
-		//		[Option(DefaultValue = true, Required = true, HelpText = "Path to input html")]
-		[CommandLine.ValueOption(0)]
-		public string InputPath { get; set; }
+		private string _pageSizeName;
 
-		//		[Option(DefaultValue = true, Required = true, HelpText = "Path to output pdf")]
-		[CommandLine.ValueOption(1)]
-		public string OutputPath { get; set; }
+		[Args.ArgsMemberSwitch(0)]
+		[Description("The file name or path to the input html. Use quotation marks if it includes spaces.")]
+		public string InputHtmlPath { get; set; }
 
-		[Option("graphite", DefaultValue = false, HelpText = "Enable SIL Graphite smart font rendering")]
+		[Args.ArgsMemberSwitch(1)]
+		[Description("The file name or path to the output pdf. Use quotation marks if it includes spaces.")]
+		public string OutputPdfPath { get; set; }
+
+		[Description("Enable SIL Graphite smart font rendering")]
+		[DefaultValue(false)]
+		[Args.ArgsMemberSwitch("-graphite")]
 		public bool EnableGraphite { get; set; }
 
-		[Option('O', "orientation", HelpText = "Set orientation to Landscape or Portrait (default Portrait)")]
-		public string Orientation { get; set; }
-
-		public bool Landscape
-		{
-			get { return Orientation!=null && Orientation.ToLower() == "landscape"; }
-			set { Orientation = value ? "landscape" : "portrait"; }
-		}
-
-		[Option('T', "margin-top", DefaultValue="10", HelpText="Set the page bottom margin")]
+		[Description("Set the page top margin")]
+		[DefaultValue("10")]
+		[Args.ArgsMemberSwitch("T","-margin-top")]
 		public string TopMargin { get; set; }
 
-		[Option('B', "margin-bottom", DefaultValue="10", HelpText="Set the page bottom margin")]
+		[Description("Set the page bottom margin")]
+		[DefaultValue("10")]
+		[Args.ArgsMemberSwitch("B", "-margin-bottom")]
 		public string BottomMargin { get; set; }
 
-		[Option('L', "margin-left", DefaultValue = "10", HelpText = "Set the page left margin")]
+		[Description("Set the page left margin")]
+		[DefaultValue("10")]
+		[Args.ArgsMemberSwitch("L", "-margin-left")]
 		public string LeftMargin { get; set; }
 
-		[Option('R', "margin-right", DefaultValue = "10", HelpText = "Set the page right margin")]
+		[Description("Set the page right margin")]
+		[DefaultValue("10")]
+		[Args.ArgsMemberSwitch("R", "-margin-right")]
 		public string RightMargin { get; set; }
 
 		private double GetMillimeters(string distance)
@@ -73,18 +76,34 @@ namespace GeckofxHtmlToPdf
 			set { RightMargin = value.ToString(); }
 		}
 
-		[Option("zoom", DefaultValue=1.0, HelpText = "Zoom/scaling factor (default 1.0)")]
-		public double Zoom { get; set; }
+		[Description("Set orientation to Landscape or Portrait")]
+		[DefaultValue("portrait")]
+		[Args.ArgsMemberSwitch("O", "-orientation")]
+		public string Orientation { get; set; }
 
-		[Option('s',"page-size", DefaultValue = "A4", HelpText = "Set paper size to: A4, Letter, etc.  (default A4)",
-			//LongName = "page-size", 
-			MutuallyExclusiveSet="PageSize")]
-		public string PageSizeName { get; set; }
+		public bool Landscape
+		{
+			get { return Orientation != null && Orientation.ToLower() == "landscape"; }
+			set { Orientation = value ? "landscape" : "portrait"; }
+		}
 
-		[Option("page-height", HelpText ="Page Height (TODO units?)", MutuallyExclusiveSet="PageSize")]
+	
+
+		[DefaultValue("A4")]
+		[Args.ArgsMemberSwitch("s","-page-size")]
+		[Description("Set paper size to: A4, Letter, etc. ")]
+		public string PageSizeName
+		{
+			get { return _pageSizeName; }
+			set { _pageSizeName = value; }
+		}
+
+		[Description("Page Height (in millimeters). Use this with along with page-width instead of page-size, if needed.")]
+		[Args.ArgsMemberSwitch("h", "-page-height")]
 		public string PageHeight { get; set; }
 
-		[Option("page-width", HelpText = "Page Width (TODO units?)")]
+		[Description("Page Width (in millimeters)")]
+		[Args.ArgsMemberSwitch("w", "-page-width")]
 		public string PageWidth { get; set; }
 
 		public double PageHeightInMillimeters
@@ -118,15 +137,27 @@ namespace GeckofxHtmlToPdf
 			set { PageWidth = value.ToString(); }//todo: units?
 		}
 
-		[Option('q', "quiet", DefaultValue = false, HelpText = "Don't show the progress dialog")]
+		[Description("Don't show the progress dialog")]
+		[Args.ArgsMemberSwitch("q", "-quiet")]
+		[DefaultValue(false)]
 		public bool NoUIMode { get; set; }
 
 		public bool IsHTTP
 		{
-			get { return InputPath.ToLower().StartsWith("http"); }
+			get { return InputHtmlPath.ToLower().StartsWith("http"); }
 		}
 
-		[Option("debug", DefaultValue = false, HelpText = "Send debugging information to the console.")]
+		[DefaultValue(false)]
+		[Description("Send debugging information to the console.")]
+		[Args.ArgsMemberSwitch("-debug","-debug-javascript")]
 		public bool Debug { get; set; }
+
+/* doesn't work yet
+		[DefaultValue(1.0)]
+		[Args.ArgsMemberSwitch("-zoom")]
+		[Description("Zoom/scaling factor")]
+ 
+		public double Zoom { get; set; }
+		*/
 	}
 }
