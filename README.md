@@ -1,7 +1,7 @@
 geckofxHtmlToPdf
 ================
 
-Command line and .net component for making pdfs from html, using the gecko engine, as wrapped by [geckofx](https://bitbucket.org/geckofx "geckofx").
+Command line and .net component for making pdfs from html, using the Mozilla Gecko engine (which powers Firefox), as wrapped by [geckofx](https://bitbucket.org/geckofx "geckofx").
 
 This project is just getting started, consider it alpha quality.
 
@@ -21,6 +21,7 @@ Other options:
 	--page-width
 	--page-height
     --quiet (-q)
+	--debug
 
 NB: Currently the only units that are supported are millimeters.
 
@@ -39,7 +40,7 @@ Unzip the XulRunner directory into the distfiles directory, so that you have dis
 
 ##RoadMap##
 
-- Add a winforms component that can be used to make PDFs easily from a winforms app without running the command line. (in progress)
+- Add a winforms component that can be used to make PDFs easily from a winforms app without running the command line. (It's there and usable but hit some snages and so suspendend for now; see notes in the code if you want to finish this up.)
 
 - Add command line parameter for:
  -  media

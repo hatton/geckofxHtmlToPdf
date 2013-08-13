@@ -1,4 +1,4 @@
-﻿namespace geckofxHtmlToPdf
+﻿namespace GeckofxHtmlToPdf
 {
 	partial class GeckofxHtmlToPdfComponent
 	{

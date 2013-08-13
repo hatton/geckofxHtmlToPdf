@@ -1,4 +1,4 @@
-﻿namespace geckofxHtmlToPdf
+﻿namespace GeckofxHtmlToPdf
 {
 	partial class ConversionProgress
 	{
@@ -31,7 +31,7 @@
 			this.components = new System.ComponentModel.Container();
 			this._statusLabel = new System.Windows.Forms.Label();
 			this._progressBar = new System.Windows.Forms.ProgressBar();
-			this._pdfMaker = new geckofxHtmlToPdf.GeckofxHtmlToPdfComponent(this.components);
+			this._pdfMaker = new GeckofxHtmlToPdfComponent(this.components);
 			this.SuspendLayout();
 			// 
 			// _statusLabel
@@ -53,7 +53,7 @@
 			// _pdfMaker
 			// 
 			this._pdfMaker.Finished += new System.EventHandler(this.OnPdfMaker_Finished);
-			this._pdfMaker.StatusChanged += new System.EventHandler<geckofxHtmlToPdf.PdfMakingStatus>(this.OnPdfMaker_StatusChanged);
+			this._pdfMaker.StatusChanged += new System.EventHandler<PdfMakingStatus>(this.OnPdfMaker_StatusChanged);
 			// 
 			// ConversionProgress
 			// 

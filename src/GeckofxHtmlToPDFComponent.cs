@@ -1,13 +1,20 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
-using System.Reflection;
 using Gecko;
 
-namespace geckofxHtmlToPdf
+namespace GeckofxHtmlToPdf
 {
-	/* Why is this a component? Only becuase the geckobrowser that we use, even though it is invisible,
+	/* NB: I am currently facing a problem in having a component using a geckofx in a client which is
+	 * also using it (which was my original use case)... setting "gfx.direct2d.disabled" to true, as we
+	 * have to do, was giving me a COM crash in the client app, which, by the time it used this, had
+	 * already been using the browser for other purposes. So for now, I'm making this class private again.
+	 * If someone really needed it, they could make it public again, particularly if they aren't already
+	 * using geckofx in their main project. But for me, it's not worth maintaining/documenting at this
+	 * point, as my client app is going to have to use this as a command-line. Note, Hindle couldn't
+	 * reproduce this in the geckofx sample app, so there's a mystery to be solved some day.
+	 * 
+	 * Why is this a component? Only becuase the geckobrowser that we use, even though it is invisible,
 	* expects to be operating on the UI thread, getting events from the Application.DoEvents() loop, etc.
 	* So we can't be making pdfs on a background thread. Having it as a component with a timer and
 	* an event to signal when it is done makes it easy for programmer incorporating this see how to use it properly.
@@ -41,33 +48,41 @@ namespace geckofxHtmlToPdf
 		}
 
 		/// <summary>
-		/// The path to the XulRunner directory. Defaults to the same directory as this assembly, or a "DistFiles" directory if
-		/// the code is being run from the geckofxHtmlToPdf visual studio solution.
+		/// The path to the XulRunner directory. Must match the version that this exe was compiled for, specifically, the version that goes with the included Geckofx-Core and Geckofx-Winforms.
 		/// </summary>
-		public string XulRunnerPath { get; set; }
-		
+		public void Initialize(string pathToXulRunnerFolder)
+		{
+			Gecko.Xpcom.Initialize(pathToXulRunnerFolder);
+		}
+
 		/// <summary>
 		/// On the application event thread, work on creating the pdf. Will raise the StatusChanged and Finished events
 		/// </summary>
 		/// <param name="conversionOrder"></param>
 		public void Start(ConversionOrder conversionOrder)
 		{
-			//for developers, this will find xulrunner in a directory called "distfiles"
-			//when installed, it will find it in the same directory as the exe.
-			if(null==XulRunnerPath)
-				XulRunnerPath = GetDirectoryDistributedWithApplication(false, "xulrunner");
-
-			Gecko.Xpcom.Initialize(XulRunnerPath);
+			if (!Gecko.Xpcom.IsInitialized)
+			{
+				throw new ApplicationException("Developer: you must call Initialize(pathToXulRunnerFolder), or do your own Gecko.Xpcom.Initialize(), before calling Start()");
+			}
 
 			//without this, we get invisible (white?) text on some machines
 			Gecko.GeckoPreferences.User["gfx.direct2d.disabled"] = true;
+
 			if (conversionOrder.EnableGraphite)
 				GeckoPreferences.User["gfx.font_rendering.graphite.enabled"] = true;
 
 			_conversionOrder = conversionOrder;
 			_browser = new GeckoWebBrowser();
 			this.components.Add(_browser);//so it gets disposed when we are
-			_browser.ConsoleMessage += OnBrowserConsoleMessage;
+
+			_browser.JavascriptError += OnJavascriptError;
+
+			if (conversionOrder.Debug)
+			{
+				_browser.ConsoleMessage += OnBrowserConsoleMessage;
+			}
+			
 			var tempFileName = Path.GetTempFileName();
 			File.Delete(tempFileName);
 			_pathToTempPdf = tempFileName + ".pdf"; 
@@ -75,6 +90,14 @@ namespace geckofxHtmlToPdf
 			_checkForBrowserNavigatedTimer.Enabled = true;
 			Status = "Loading Html...";
 			_browser.Navigate(_conversionOrder.InputPath);
+		}
+
+		void OnJavascriptError(object sender, JavascriptErrorEventArgs e)
+		{
+			if (_conversionOrder.Debug)
+			{
+				Console.WriteLine("GeckofxHtmlToPdf: {0} Line {1} Position {2}: {3}",e.Filename,e.Line,e.Pos,e.Message); 
+			}
 		}
 
 		protected virtual void RaiseStatusChanged(PdfMakingStatus e)
@@ -256,94 +279,6 @@ namespace geckofxHtmlToPdf
 		{
 		}
 
-		#endregion
-
-		#region FindingXulRunner
-
-		/// <summary>
-		/// Find a file which, on a development machine, lives in [solution]/DistFiles/[subPath],
-		/// and when installed, lives in 
-		/// [applicationFolder]/[subPath1]/[subPathN]
-		/// </summary>
-		/// <example>GetFileDistributedWithApplication("info", "releaseNotes.htm");</example>
-		public static string GetDirectoryDistributedWithApplication(bool optional, params string[] partsOfTheSubPath)
-		{
-			var path = DirectoryOfApplicationOrSolution;
-			foreach (var part in partsOfTheSubPath)
-			{
-				path = System.IO.Path.Combine(path, part);
-			}
-			if (Directory.Exists(path))
-				return path;
-
-			//try distfiles
-			path = DirectoryOfApplicationOrSolution;
-			path = Path.Combine(path, "distFiles");
-			foreach (var part in partsOfTheSubPath)
-			{
-				path = System.IO.Path.Combine(path, part);
-			}
-			if (Directory.Exists(path))
-				return path;
-
-			//try src (e.g. Bloom keeps its javascript under source directory (and in distfiles only when installed)
-			path = DirectoryOfApplicationOrSolution;
-			path = Path.Combine(path, "src");
-			foreach (var part in partsOfTheSubPath)
-			{
-				path = System.IO.Path.Combine(path, part);
-			}
-
-			if (optional && !Directory.Exists(path))
-				return null;
-
-			if (!Directory.Exists(path))
-				throw new ApplicationException("Could not locate " + path);
-			return path;
-		}
-
-		/// <summary>
-		/// Gives the directory of either the project folder (if running from visual studio), or
-		/// the installation folder.  Helpful for finding templates and things; by using this,
-		/// you don't have to copy those files into the build directory during development.
-		/// It assumes your build directory has "output" as part of its path.
-		/// </summary>
-		/// <returns></returns>
-		public static string DirectoryOfApplicationOrSolution
-		{
-			get
-			{
-				string path = DirectoryOfTheApplicationExecutable;
-				char sep = Path.DirectorySeparatorChar;
-				int i = path.ToLower().LastIndexOf(sep + "output" + sep);
-
-				if (i > -1)
-				{
-					path = path.Substring(0, i + 1);
-				}
-				return path;
-			}
-		}
-
-		public static string DirectoryOfTheApplicationExecutable
-		{
-			get
-			{
-				string path;
-				bool unitTesting = Assembly.GetEntryAssembly() == null;
-				if (unitTesting)
-				{
-					path = new Uri(Assembly.GetExecutingAssembly().CodeBase).AbsolutePath;
-					path = Uri.UnescapeDataString(path);
-				}
-				else
-				{
-					var assembly = Assembly.GetEntryAssembly();
-					path = assembly.Location;
-				}
-				return Directory.GetParent(path).FullName;
-			}
-		}
 		#endregion
 	}
 

@@ -6,7 +6,7 @@ using System.Threading;
 using System.Windows.Forms;
 using Gecko;
 
-namespace geckofxHtmlToPdf
+namespace GeckofxHtmlToPdf
 {
 	/// <summary>
 	/// The "Program" is used when this is invoked via command line, rather than embedded in a winforms app.

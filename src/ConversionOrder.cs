@@ -1,7 +1,7 @@
 ﻿using System;
 using CommandLine;
 
-namespace geckofxHtmlToPdf
+namespace GeckofxHtmlToPdf
 {
 	/// <summary>
 	/// a goal here is to follow the wkhtmltopdf parameters where it makes sense, to ease people  switching
@@ -125,5 +125,8 @@ namespace geckofxHtmlToPdf
 		{
 			get { return InputPath.ToLower().StartsWith("http"); }
 		}
+
+		[Option("debug", DefaultValue = false, HelpText = "Send debugging information to the console.")]
+		public bool Debug { get; set; }
 	}
 }
