@@ -207,6 +207,10 @@ namespace GeckofxHtmlToPdf
 			printSettings.SetFooterStrLeftAttribute("");
 			printSettings.SetFooterStrCenterAttribute("");
 
+			printSettings.SetPrintBGColorsAttribute(true);
+			printSettings.SetPrintBGImagesAttribute(true);
+
+
 			//TODO: doesn't seem to do anything. Probably a problem in the geckofx wrapper
 			//printSettings.SetScalingAttribute(_conversionOrder.Zoom);
 			
@@ -241,7 +245,7 @@ namespace GeckofxHtmlToPdf
 
 		private void OnCheckForBrowserNavigatedTimerTick(object sender, EventArgs e)
 		{
-			if (_browser.Document != null && _browser.Document.ActiveElement != null)
+			if (_browser.Document.ReadyState == "complete")
 			{
 				_checkForBrowserNavigatedTimer.Enabled = false;
 				StartMakingPdf();

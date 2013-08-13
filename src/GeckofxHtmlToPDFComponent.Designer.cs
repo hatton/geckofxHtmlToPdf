@@ -38,7 +38,7 @@
 			// 
 			// _checkForBrowserNavigatedTimer
 			// 
-			this._checkForBrowserNavigatedTimer.Interval = 3000;
+			this._checkForBrowserNavigatedTimer.Interval = 50;
 			this._checkForBrowserNavigatedTimer.Tick += new System.EventHandler(this.OnCheckForBrowserNavigatedTimerTick);
 
 		}
