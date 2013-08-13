@@ -27,7 +27,7 @@ namespace GeckofxHtmlToPdf
 
 			var argsDefinition = Args.Configuration.Configure<ConversionOrder>();
 			argsDefinition.SwitchDelimiter = "-";
-			argsDefinition.CommandModelDescription = "GeckofxHtmlToPdf";
+			argsDefinition.CommandModelDescription = "GeckofxHtmlToPdf, using Xulrunner (Firefox) 22";
 
 			if (args.Length < 3 || (args.Length > 1 && (new string[] {"-h", "/h","?", "/?", "-?", "help"}).Contains(args[1].ToLower())))
 			{
@@ -77,7 +77,7 @@ namespace GeckofxHtmlToPdf
 
 		private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
 		{
-			Console.Error.WriteLine(e.Exception.Message);
+			Console.WriteLine("geckofxPdfToHtml: "+e.Exception.Message);
 			_returnCode = 1;
 			Application.Exit();
 		}
@@ -85,9 +85,9 @@ namespace GeckofxHtmlToPdf
 		private static void HandleUnhandledException(object sender, UnhandledExceptionEventArgs e)
 		{
 			if (e.ExceptionObject is Exception)
-                Console.Error.WriteLine(((Exception) e.ExceptionObject).Message);
+                Console.WriteLine(((Exception) e.ExceptionObject).Message);
             else
-                Console.Error.WriteLine("geckohtmltopdf got unknown exception");
+                Console.WriteLine("geckohtmltopdf got unknown exception");
 			_returnCode = 1;
 			Application.Exit();
 			
