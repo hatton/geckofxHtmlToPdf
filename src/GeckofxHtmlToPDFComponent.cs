@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.IO;
 using Gecko;
 
@@ -86,10 +88,10 @@ namespace GeckofxHtmlToPdf
 			var tempFileName = Path.GetTempFileName();
 			File.Delete(tempFileName);
 			_pathToTempPdf = tempFileName + ".pdf"; 
-			File.Delete(_conversionOrder.OutputPath);
+			File.Delete(_conversionOrder.OutputPdfPath);
 			_checkForBrowserNavigatedTimer.Enabled = true;
 			Status = "Loading Html...";
-			_browser.Navigate(_conversionOrder.InputPath);
+			_browser.Navigate(_conversionOrder.InputHtmlPath);
 		}
 
 		void OnJavascriptError(object sender, JavascriptErrorEventArgs e)
@@ -121,6 +123,45 @@ namespace GeckofxHtmlToPdf
 			Console.WriteLine(e.Message);
 		}
 
+		private class PaperSize
+		{
+			public readonly string Name;
+			public readonly double WidthInMillimeters;
+			public readonly double HeightInMillimeters;
+
+			public PaperSize(string name, double widthInMillimeters, double heightInMillimeters)
+			{
+				Name = name;
+				WidthInMillimeters = widthInMillimeters;
+				HeightInMillimeters = heightInMillimeters;
+			}
+		}
+
+		private PaperSize GetPaperSize(string name)
+		{
+			name = name.ToLower();
+			var sizes = new List<PaperSize>
+				{
+					new PaperSize("a3", 297, 420),
+					new PaperSize("a4", 210, 297),
+					new PaperSize("a5", 148, 210),
+					new PaperSize("a6", 105, 148),
+					new PaperSize("b3", 353, 500),
+					new PaperSize("b4", 250, 353),
+					new PaperSize("b5", 176, 250),
+					new PaperSize("b6", 125, 176),
+					new PaperSize("letter", 215.9, 279.4),
+					new PaperSize("legal", 215.9, 355.6)
+				};
+
+			var match =sizes.Find(s => s.Name == name);
+			if (match != null)
+				return match;
+
+			throw new ApplicationException(
+					"Sorry, currently GeckofxHtmlToPDF has a very limited set of paper sizes it knows about. Consider using the page-height and page-width arguments instead");
+		}
+
 		private void StartMakingPdf()
 		{
 			nsIWebBrowserPrint print = Xpcom.QueryInterface<nsIWebBrowserPrint>(_browser.Window.DomWindow);
@@ -140,42 +181,14 @@ namespace GeckofxHtmlToPdf
 			}
 			else
 			{
-				printSettings.SetPaperSizeUnitAttribute(1);
-				//doesn't actually work.  Probably a problem in the geckofx wrapper
+				//doesn't actually work.  Probably a problem in the geckofx wrapper. Meanwhile we just look it up from our small list
 				//printSettings.SetPaperNameAttribute(_conversionOrder.PageSizeName);
-				if (_conversionOrder.PageSizeName.ToLower() == "a4")
-				{
-					printSettings.SetPaperWidthAttribute(210);
-					printSettings.SetPaperHeightAttribute(297);
-				}
-				else if (_conversionOrder.PageSizeName.ToLower() == "a5")
-				{
-					printSettings.SetPaperWidthAttribute(148);
-					printSettings.SetPaperHeightAttribute(210);
-				}
-				else if (_conversionOrder.PageSizeName.ToLower() == "a3")
-				{
-					printSettings.SetPaperWidthAttribute(297);
-					printSettings.SetPaperHeightAttribute(420);
-				}
-				else if (_conversionOrder.PageSizeName.ToLower() == "b5")
-				{
-					printSettings.SetPaperWidthAttribute(176);
-					printSettings.SetPaperHeightAttribute(250);
-				}
-				else if (_conversionOrder.PageSizeName.ToLower() == "letter")
-				{
-					printSettings.SetPaperWidthAttribute(215.9);
-					printSettings.SetPaperHeightAttribute(279.4);
-				}
-				else if (_conversionOrder.PageSizeName.ToLower() == "legal")
-				{
-					printSettings.SetPaperWidthAttribute(215.9);
-					printSettings.SetPaperHeightAttribute(355.6);
-				}
-				else
-					throw new ApplicationException(
-						"Sorry, currently GeckofxHtmlToPDF has a very limited set of paper sizes it knows about. Consider using the page-height and page-width arguments instead");
+
+				var size = GetPaperSize(_conversionOrder.PageSizeName);
+				const double inchesPerMillimeter = 0.0393701;
+				printSettings.SetPaperHeightAttribute(size.HeightInMillimeters*inchesPerMillimeter);
+				printSettings.SetPaperWidthAttribute(size.WidthInMillimeters*inchesPerMillimeter);
+
 			}
 			//this seems to be in inches, and doesn't have a unit-setter (unlike the paper size ones)
 			const double kMillimetersPerInch = 25; //TODO what is it, exactly?
@@ -195,7 +208,8 @@ namespace GeckofxHtmlToPdf
 			printSettings.SetFooterStrCenterAttribute("");
 
 			//TODO: doesn't seem to do anything. Probably a problem in the geckofx wrapper
-			printSettings.SetScalingAttribute(_conversionOrder.Zoom);
+			//printSettings.SetScalingAttribute(_conversionOrder.Zoom);
+			
 			printSettings.SetOutputFormatAttribute(2); // 2 == kOutputFormatPDF
 
 			Status = "Making PDF..";
@@ -212,7 +226,7 @@ namespace GeckofxHtmlToPdf
 
 			try
 			{
-				File.Move(_pathToTempPdf, _conversionOrder.OutputPath);
+				File.Move(_pathToTempPdf, _conversionOrder.OutputPdfPath);
 				RaiseFinished();
 			}
 			catch (IOException e)
@@ -221,7 +235,7 @@ namespace GeckofxHtmlToPdf
 				throw new ApplicationException(
 					string.Format(
 						"Tried to move the file {0} to {1}, but the Operating System said that one of these files was locked. Please try again.\r\n\r\nDetails: {1}",
-						_pathToTempPdf, _conversionOrder.OutputPath, e.Message));
+						_pathToTempPdf, _conversionOrder.OutputPdfPath, e.Message));
 			}
 		}
 
