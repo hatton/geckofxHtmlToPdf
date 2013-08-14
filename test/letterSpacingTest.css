@@ -1,0 +1,31 @@
+H1
+{
+	color: #606060;
+	font-size: 32pt;
+	text-align: center;
+	font-family: arial;
+}
+H2
+{
+	background-color: #E8E7E7;
+	font-family: arial;
+	font-weight: normal;
+	color: #999595;
+	padding-top: 0px;
+	margin-top: 41px;
+}
+H3
+{
+	background-color: #E8E7E7;
+	font-family: arial;
+	font-weight: normal;
+	color: #999595;
+	font-size: 9pt;
+	margin-top: -25px;
+}
+BODY
+{
+	padding-right: 29px;
+	padding-left: 37px;
+	padding-top: 22px;
+}

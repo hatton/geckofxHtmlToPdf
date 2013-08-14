@@ -25,6 +25,8 @@ Other options:
 
 NB: Currently the only units that are supported are millimeters.
 
+NB: Currently the input and output paths must precede the parameters (this appears to be a requirement of args.dll).
+
 ##Requirements##
 
 .Net 4.0 Runtime (not yet tested with mono equivalent)

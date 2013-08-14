@@ -51,7 +51,6 @@ namespace GeckofxHtmlToPdf
 		{
 			_statusLabel.Text = pdfMakingStatus.statusLabel;
 			_progressBar.Value = pdfMakingStatus.percentage;
-			Debug.WriteLine(_progressBar.Value.ToString());
 		}
 
 		#region FindingXulRunner

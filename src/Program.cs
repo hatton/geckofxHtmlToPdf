@@ -29,7 +29,7 @@ namespace GeckofxHtmlToPdf
 			argsDefinition.SwitchDelimiter = "-";
 			argsDefinition.CommandModelDescription = "GeckofxHtmlToPdf, using Xulrunner (Firefox) 22";
 
-			if (args.Length < 3 || (args.Length > 1 && (new string[] {"-h", "/h","?", "/?", "-?", "help"}).Contains(args[1].ToLower())))
+			if (args.Length < 2 || (args.Length >0 && (new string[] {"-h", "/h","?", "/?", "-?", "help"}).Contains(args[1].ToLower())))
 			{
 				ShowHelp(argsDefinition);
 				return 0;
@@ -45,18 +45,29 @@ namespace GeckofxHtmlToPdf
 				ShowHelp(argsDefinition);
 				return 1;
 			}
-			
 
-			if(!conversionOrder.IsHTTP && !File.Exists(conversionOrder.InputHtmlPath))
+			if (!conversionOrder.IsHTTP)
 			{
-				Console.Error.WriteLine(
-					"GeckofxHtmlToPDF could not locate the input file: " + conversionOrder.InputHtmlPath);
-				Console.WriteLine(
-					"GeckofxHtmlToPDF could not locate the input file: "+conversionOrder.InputHtmlPath);
+				conversionOrder.InputHtmlPath = GetRootedPath(conversionOrder.InputHtmlPath);
 
+				if (!File.Exists(conversionOrder.InputHtmlPath))
+				{
+					Console.WriteLine(
+						"GeckofxHtmlToPDF could not locate the input file: " + conversionOrder.InputHtmlPath);
+
+					return 2;
+				}
+			}
+
+			conversionOrder.OutputPdfPath = GetRootedPath(conversionOrder.OutputPdfPath);
+
+			if (!Directory.Exists(Path.GetDirectoryName(conversionOrder.OutputPdfPath)))
+			{
+				Console.WriteLine(
+					"GeckofxHtmlToPDF could not locate the target directory for the pdf: " + Path.GetDirectoryName(conversionOrder.OutputPdfPath));
 				return 2;
 			}
-			
+
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
 
@@ -66,6 +77,14 @@ namespace GeckofxHtmlToPdf
 			//Browser requires an Application event loop. This could eventually be a progress window or be invisible
 			Application.Run(new ConversionProgress(conversionOrder));
 			return _returnCode;
+		}
+
+		private static string GetRootedPath(string path)
+		{
+			if (Path.IsPathRooted(path))
+				return path;
+
+			return Path.Combine(Environment.CurrentDirectory, path);
 		}
 
 		private static void ShowHelp(IModelBindingDefinition<ConversionOrder> argsDefinition)

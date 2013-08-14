@@ -79,7 +79,7 @@ namespace GeckofxHtmlToPdf
 			this.components.Add(_browser);//so it gets disposed when we are
 
 			_browser.JavascriptError += OnJavascriptError;
-
+			
 			if (conversionOrder.Debug)
 			{
 				_browser.ConsoleMessage += OnBrowserConsoleMessage;
