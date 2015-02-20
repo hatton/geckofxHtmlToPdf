@@ -4,6 +4,9 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
+using Gecko;
+using System.Linq;
+using System.Configuration;
 
 namespace GeckofxHtmlToPdf
 {
@@ -26,8 +29,7 @@ namespace GeckofxHtmlToPdf
 				this.ShowInTaskbar = false;
 			}
 
-			var xulRunnerPath = GetDirectoryDistributedWithApplication(false,"xulrunner");
-			_pdfMaker.Initialize(xulRunnerPath);
+			SetUpXulRunner();
 		}
 
 		private void ConversionProgress_Load(object sender, EventArgs e)
@@ -54,49 +56,6 @@ namespace GeckofxHtmlToPdf
 		}
 
 		#region FindingXulRunner
-
-		/// <summary>
-		/// Find a file which, on a development machine, lives in [solution]/DistFiles/[subPath],
-		/// and when installed, lives in 
-		/// [applicationFolder]/[subPath1]/[subPathN]
-		/// </summary>
-		/// <example>GetFileDistributedWithApplication("info", "releaseNotes.htm");</example>
-		public static string GetDirectoryDistributedWithApplication(bool optional, params string[] partsOfTheSubPath)
-		{
-			var path = DirectoryOfApplicationOrSolution;
-			foreach (var part in partsOfTheSubPath)
-			{
-				path = System.IO.Path.Combine(path, part);
-			}
-			if (Directory.Exists(path))
-				return path;
-
-			//try distfiles
-			path = DirectoryOfApplicationOrSolution;
-			path = Path.Combine(path, "distFiles");
-			foreach (var part in partsOfTheSubPath)
-			{
-				path = System.IO.Path.Combine(path, part);
-			}
-			if (Directory.Exists(path))
-				return path;
-
-			//try src (e.g. Bloom keeps its javascript under source directory (and in distfiles only when installed)
-			path = DirectoryOfApplicationOrSolution;
-			path = Path.Combine(path, "src");
-			foreach (var part in partsOfTheSubPath)
-			{
-				path = System.IO.Path.Combine(path, part);
-			}
-
-			if (optional && !Directory.Exists(path))
-				return null;
-
-			if (!Directory.Exists(path))
-				throw new ApplicationException("Could not locate " + path);
-			return path;
-		}
-
 		/// <summary>
 		/// Gives the directory of either the project folder (if running from visual studio), or
 		/// the installation folder.  Helpful for finding templates and things; by using this,
@@ -137,6 +96,85 @@ namespace GeckofxHtmlToPdf
 					path = assembly.Location;
 				}
 				return Directory.GetParent(path).FullName;
+			}
+		}
+
+		/// <summary>
+		/// Initialize Xpcom so that we can access xulrunner via Geckofx.
+		/// </summary>
+		/// <remarks>
+		/// This logic is a merge of the original logic in the program (which looked
+		/// in distfiles) and the logic in BloomExe/Browser.cs (which looks at the
+		/// environment variable XULRUNNER and later in lib).  It would be nice to
+		/// a common place where this code could exist once, but that's left for
+		/// another day.  One of the palaso libraries might be a good place, but
+		/// it demands indirect access to Xpcom via reflection.
+		/// </remarks>
+		public static void SetUpXulRunner()
+		{
+			if (Xpcom.IsInitialized)
+				return;
+
+			string xulRunnerPath = Environment.GetEnvironmentVariable("XULRUNNER");
+			if (String.IsNullOrEmpty(xulRunnerPath) || !Directory.Exists(xulRunnerPath))
+			{
+				xulRunnerPath = Path.Combine(DirectoryOfApplicationOrSolution, "xulrunner");
+				if (!Directory.Exists(xulRunnerPath))
+				{
+					//if this is a programmer, go look in the lib directory
+					xulRunnerPath = Path.Combine(DirectoryOfApplicationOrSolution,
+						Path.Combine("lib", "xulrunner"));
+				}
+				//on my build machine, I really like to have the dir labelled with the version.
+				//but it's a hassle to update all the other parts (installer, build machine) with this number,
+				//so we only use it if we don't find the unnumbered alternative.
+				if (!Directory.Exists(xulRunnerPath))
+				{
+					xulRunnerPath = Path.Combine(DirectoryOfApplicationOrSolution,
+						Path.Combine("lib", "xulrunner" + XulRunnerVersion));
+				}
+				if (!Directory.Exists(xulRunnerPath))
+				{
+					//or, go look in the distfiles directory
+					xulRunnerPath = Path.Combine(DirectoryOfApplicationOrSolution,
+						Path.Combine("distfiles", "xulrunner"));
+				}
+				if (!Directory.Exists(xulRunnerPath))
+				{
+					xulRunnerPath = Path.Combine(DirectoryOfApplicationOrSolution,
+						Path.Combine("distfiles", "xulrunner" + XulRunnerVersion));
+				}
+				if (!Directory.Exists(xulRunnerPath))
+				{
+					throw new Exception(String.Format("Can't find the directory where xulrunner (version {0}) is installed", XulRunnerVersion));
+				}
+			}
+
+			Xpcom.Initialize(xulRunnerPath);
+
+			Application.ApplicationExit += OnApplicationExit;
+		}
+
+		private static void OnApplicationExit(object sender, EventArgs e)
+		{
+			// We come here iff we initialized Xpcom. In that case we want to call shutdown,
+			// otherwise the app might not exit properly.
+			if (Xpcom.IsInitialized)
+				Xpcom.Shutdown();
+			Application.ApplicationExit -= OnApplicationExit;
+		}
+
+		private static int XulRunnerVersion
+		{
+			get
+			{
+				var geckofx = Assembly.GetAssembly(typeof(GeckoWebBrowser));
+				if (geckofx == null)
+					return 0;
+
+				var versionAttribute = geckofx.GetCustomAttributes(typeof(AssemblyFileVersionAttribute), true)
+					.FirstOrDefault() as AssemblyFileVersionAttribute;
+				return versionAttribute == null ? 0 : new Version(versionAttribute.Version).Major;
 			}
 		}
 		#endregion

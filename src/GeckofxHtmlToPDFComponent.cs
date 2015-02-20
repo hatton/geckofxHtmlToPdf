@@ -50,14 +50,6 @@ namespace GeckofxHtmlToPdf
 		}
 
 		/// <summary>
-		/// The path to the XulRunner directory. Must match the version that this exe was compiled for, specifically, the version that goes with the included Geckofx-Core and Geckofx-Winforms.
-		/// </summary>
-		public void Initialize(string pathToXulRunnerFolder)
-		{
-			Gecko.Xpcom.Initialize(pathToXulRunnerFolder);
-		}
-
-		/// <summary>
 		/// On the application event thread, work on creating the pdf. Will raise the StatusChanged and Finished events
 		/// </summary>
 		/// <param name="conversionOrder"></param>
@@ -91,6 +83,15 @@ namespace GeckofxHtmlToPdf
 			File.Delete(_conversionOrder.OutputPdfPath);
 			_checkForBrowserNavigatedTimer.Enabled = true;
 			Status = "Loading Html...";
+
+			// Why set a size here? If we don't, images sometimes don't show up in the PDF. See BL-408.
+			// A size of 500x500 was enough to fix the problem for the most reproducible case,
+			// JohnH's version of Pame's Family Battles Maleria. The size used here is based
+			// on an unproved hypothesis that it's important for at least one picture to be
+			// visible in the imaginary browser window; thus, we've made it big enough for a
+			// 16x11 big-book page at fairly high screen resolution of 120dpi.
+			_browser.Size = new Size(1920, 1320);
+
 			_browser.Navigate(_conversionOrder.InputHtmlPath);
 		}
 
@@ -170,6 +171,7 @@ namespace GeckofxHtmlToPdf
 			var printSettings = service.GetNewPrintSettingsAttribute();
 
 			printSettings.SetToFileNameAttribute(_pathToTempPdf);
+			printSettings.SetPrintToFileAttribute(true);
 			printSettings.SetPrintSilentAttribute(true); //don't show a printer settings dialog
 			printSettings.SetShowPrintProgressAttribute(false);
 
@@ -185,13 +187,13 @@ namespace GeckofxHtmlToPdf
 				//printSettings.SetPaperNameAttribute(_conversionOrder.PageSizeName);
 
 				var size = GetPaperSize(_conversionOrder.PageSizeName);
-				const double inchesPerMillimeter = 0.0393701;
+				const double inchesPerMillimeter = 0.0393701;	// (or more precisely, 0.0393700787402)
 				printSettings.SetPaperHeightAttribute(size.HeightInMillimeters*inchesPerMillimeter);
 				printSettings.SetPaperWidthAttribute(size.WidthInMillimeters*inchesPerMillimeter);
 
 			}
 			//this seems to be in inches, and doesn't have a unit-setter (unlike the paper size ones)
-			const double kMillimetersPerInch = 25; //TODO what is it, exactly?
+			const double kMillimetersPerInch = 25.4; // (or more precisely, 25.3999999999726)
 			printSettings.SetMarginTopAttribute(_conversionOrder.TopMarginInMillimeters/kMillimetersPerInch);
 			printSettings.SetMarginBottomAttribute(_conversionOrder.BottomMarginInMillimeters/kMillimetersPerInch);
 			printSettings.SetMarginLeftAttribute(_conversionOrder.LeftMarginInMillimeters/kMillimetersPerInch);
@@ -225,8 +227,9 @@ namespace GeckofxHtmlToPdf
 		private void FinishMakingPdf()
 		{
 			if (!File.Exists(_pathToTempPdf))
-				throw new ApplicationException(
-					"GeckoFxHtmlToPdf was not able to create the PDF.\r\n\r\nDetails: Gecko did not produce the expected document.");
+				throw new ApplicationException(string.Format(
+					"GeckoFxHtmlToPdf was not able to create the PDF file ({0}).{1}{1}Details: Gecko did not produce the expected document.",
+					_pathToTempPdf, Environment.NewLine));
 
 			try
 			{
@@ -235,17 +238,17 @@ namespace GeckofxHtmlToPdf
 			}
 			catch (IOException e)
 			{
-				//TODO: we can get here for a different reason: the source file is still in use
+				// We can get here for a different reason: the source file is still in use
 				throw new ApplicationException(
 					string.Format(
-						"Tried to move the file {0} to {1}, but the Operating System said that one of these files was locked. Please try again.\r\n\r\nDetails: {1}",
-						_pathToTempPdf, _conversionOrder.OutputPdfPath, e.Message));
+						"Tried to move the file {0} to {1}, but the Operating System said that one of these files was locked. Please try again.{2}{2}Details: {3}",
+						_pathToTempPdf, _conversionOrder.OutputPdfPath, Environment.NewLine, e.Message));
 			}
 		}
 
 		private void OnCheckForBrowserNavigatedTimerTick(object sender, EventArgs e)
 		{
-			if (_browser.Document.ReadyState == "complete")
+			if (_browser.Document != null && _browser.Document.ReadyState == "complete")
 			{
 				_checkForBrowserNavigatedTimer.Enabled = false;
 				StartMakingPdf();
