@@ -21,13 +21,14 @@ namespace GeckofxHtmlToPdf
 		private static int Main(string[] args)
 		{
 			//allows us to output to the console even though we are a winforms app (which we are because geckofx needs the event pump)
-			AttachConsole(-1);
+			if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+				AttachConsole(-1);
 
 			//using https://github.com/hatton/args. This fork includes the defaults in the message that gets printed.
 
 			var argsDefinition = Args.Configuration.Configure<ConversionOrder>();
 			argsDefinition.SwitchDelimiter = "-";
-			argsDefinition.CommandModelDescription = "GeckofxHtmlToPdf, using Xulrunner (Firefox) 22";
+			argsDefinition.CommandModelDescription = "GeckofxHtmlToPdf, using Xulrunner (Firefox) 29";
 
 			if (args.Length < 2 || (args.Length >0 && (new string[] {"-h", "/h","?", "/?", "-?", "help"}).Contains(args[1].ToLower())))
 			{
@@ -96,17 +97,24 @@ namespace GeckofxHtmlToPdf
 
 		private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
 		{
-			Console.WriteLine("geckofxPdfToHtml: "+e.Exception.Message);
+			Console.WriteLine("GeckofxHtmlToPdf Thread Exception: " + e.Exception.Message);
+			Console.WriteLine(e.Exception.StackTrace);
 			_returnCode = 1;
 			Application.Exit();
 		}
 
 		private static void HandleUnhandledException(object sender, UnhandledExceptionEventArgs e)
 		{
-			if (e.ExceptionObject is Exception)
-                Console.WriteLine(((Exception) e.ExceptionObject).Message);
-            else
-                Console.WriteLine("geckohtmltopdf got unknown exception");
+			var except = e.ExceptionObject as Exception;
+			if (except != null)
+			{
+				Console.WriteLine("Unhandled Exception: " + except.Message);
+				Console.WriteLine(except.StackTrace);
+			}
+			else
+			{
+				Console.WriteLine("GeckofxHtmlToPdf got unknown exception");
+			}
 			_returnCode = 1;
 			Application.Exit();
 			
