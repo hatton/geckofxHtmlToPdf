@@ -47,7 +47,7 @@ namespace GeckofxHtmlToPdf
 				return 1;
 			}
 
-			if (!conversionOrder.IsHTTP)
+			if (!conversionOrder.IsHTTP && !conversionOrder.IsFile)
 			{
 				conversionOrder.InputHtmlPath = GetRootedPath(conversionOrder.InputHtmlPath);
 

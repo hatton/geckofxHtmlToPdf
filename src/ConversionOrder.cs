@@ -147,6 +147,11 @@ namespace GeckofxHtmlToPdf
 			get { return InputHtmlPath.ToLower().StartsWith("http"); }
 		}
 
+		public bool IsFile
+		{
+			get { return InputHtmlPath.ToLower().StartsWith("file://"); }
+		}
+
 		[DefaultValue(false)]
 		[Description("Send debugging information to the console.")]
 		[Args.ArgsMemberSwitch("-debug","-debug-javascript")]
