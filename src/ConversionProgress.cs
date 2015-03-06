@@ -152,17 +152,25 @@ namespace GeckofxHtmlToPdf
 
 			Xpcom.Initialize(xulRunnerPath);
 
-			Application.ApplicationExit += OnApplicationExit;
+			// Calling Xpcom.Shutdown() in this program causes a post-exit crash on
+			// both Linux and Windows (for Geckofx 29).  But if/when we move to a
+			// newer version of GeckoFx, that may change so I'm leaving the commented
+			// out line of code here.
+			//Application.ApplicationExit += OnApplicationExit;
 		}
 
-		private static void OnApplicationExit(object sender, EventArgs e)
-		{
-			// We come here iff we initialized Xpcom. In that case we want to call shutdown,
-			// otherwise the app might not exit properly.
-			if (Xpcom.IsInitialized)
-				Xpcom.Shutdown();
-			Application.ApplicationExit -= OnApplicationExit;
-		}
+		// This particular program does not exit properly iff we call Xpcom.Shutdown(),
+		// at least for Geckofx 29.  It appears to exit okay if we don't call this
+		// "required" method.  That may change with a newer version of GeckoFx, so
+		// I'm leaving the commented out code here.
+		//private static void OnApplicationExit(object sender, EventArgs e)
+		//{
+		//	// We come here iff we initialized Xpcom. In that case we want to call shutdown,
+		//	// otherwise the app might not exit properly.
+		//	if (Xpcom.IsInitialized)
+		//		Xpcom.Shutdown();
+		//	Application.ApplicationExit -= OnApplicationExit;
+		//}
 
 		private static int XulRunnerVersion
 		{
