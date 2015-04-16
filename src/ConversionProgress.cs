@@ -28,12 +28,12 @@ namespace GeckofxHtmlToPdf
 				this.WindowState = FormWindowState.Minimized;
 				this.ShowInTaskbar = false;
 			}
-
 			SetUpXulRunner();
 		}
 
 		private void ConversionProgress_Load(object sender, EventArgs e)
 		{
+			Text = "Working...";
 			_pdfMaker.Start(_conversionOrder);
 		}
 
