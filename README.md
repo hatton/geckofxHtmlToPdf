@@ -30,7 +30,7 @@ NB: Currently the input and output paths must precede the parameters (this appea
 ##Requirements##
 
 .Net 4.0 Runtime (not yet tested with mono equivalent)
-XulRunner that matches the version of geckofx dlls (current version 22).
+XulRunner that matches the version of geckofx dlls (current version 29).
 Nuget to get dependencies
 
 ##Building##
@@ -38,7 +38,7 @@ Nuget to get dependencies
 Use Nuget to pull down the commandline library.
 
 Unzip the XulRunner directory into the distfiles directory, so that you have distfiles/xulrunner.
-[http://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/22.0/runtimes/](http://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/22.0/runtimes/)
+[http://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/22.0/runtimes/](http://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/29.0/runtimes/)
 
 ##RoadMap##
 
