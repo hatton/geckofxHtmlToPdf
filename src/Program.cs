@@ -18,6 +18,7 @@ namespace GeckofxHtmlToPdf
 		[System.Runtime.InteropServices.DllImportAttribute("kernel32.dll", EntryPoint = "AttachConsole")]
 		static extern bool AttachConsole(int dwProcessId);
 
+		[STAThread]
 		private static int Main(string[] args)
 		{
 			//allows us to output to the console even though we are a winforms app (which we are because geckofx needs the event pump)
