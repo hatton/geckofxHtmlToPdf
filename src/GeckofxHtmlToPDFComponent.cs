@@ -212,6 +212,8 @@ namespace GeckofxHtmlToPdf
 			printSettings.SetPrintBGColorsAttribute(true);
 			printSettings.SetPrintBGImagesAttribute(true);
 
+			printSettings.SetShrinkToFitAttribute(false);
+
 
 			//TODO: doesn't seem to do anything. Probably a problem in the geckofx wrapper
 			//printSettings.SetScalingAttribute(_conversionOrder.Zoom);
