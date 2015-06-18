@@ -192,13 +192,20 @@ namespace GeckofxHtmlToPdf
 				printSettings.SetPaperWidthAttribute(size.WidthInMillimeters*inchesPerMillimeter);
 
 			}
+
+			// BL-2346: On Linux the margins were not being set correctly due to the "unwritable margins"
+			//          which were defaulting to 0.25 inches.
+			printSettings.SetUnwriteableMarginTopAttribute(0d);
+			printSettings.SetUnwriteableMarginBottomAttribute(0d);
+			printSettings.SetUnwriteableMarginLeftAttribute(0d);
+			printSettings.SetUnwriteableMarginRightAttribute(0d);
+
 			//this seems to be in inches, and doesn't have a unit-setter (unlike the paper size ones)
 			const double kMillimetersPerInch = 25.4; // (or more precisely, 25.3999999999726)
 			printSettings.SetMarginTopAttribute(_conversionOrder.TopMarginInMillimeters/kMillimetersPerInch);
 			printSettings.SetMarginBottomAttribute(_conversionOrder.BottomMarginInMillimeters/kMillimetersPerInch);
 			printSettings.SetMarginLeftAttribute(_conversionOrder.LeftMarginInMillimeters/kMillimetersPerInch);
 			printSettings.SetMarginRightAttribute(_conversionOrder.RightMarginInMillimeters/kMillimetersPerInch);
-
 
 			printSettings.SetDownloadFontsAttribute(true); //review: what's this for?
 			printSettings.SetOrientationAttribute(_conversionOrder.Landscape ? 1 : 0);
