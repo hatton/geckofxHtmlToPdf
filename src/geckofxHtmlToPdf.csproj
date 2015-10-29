@@ -106,6 +106,14 @@
     <PostBuildEvent Condition="'$(VS110COMNTOOLS)'!=''">"$(VS110COMNTOOLS)..\..\VC\bin\editbin.exe" /largeaddressaware "$(TargetPath)"</PostBuildEvent>
     <PostBuildEvent Condition="'$(VS120COMNTOOLS)'!=''">"$(VS120COMNTOOLS)..\..\VC\bin\editbin.exe" /largeaddressaware "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>IF  EXIST  "%25VS140COMNTOOLS%25"  CALL  "%25VS140COMNTOOLS%25vsvars32.bat"
+IF  EXIST  "%25VS120COMNTOOLS%25"  CALL  "%25VS120COMNTOOLS%25vsvars32.bat"
+IF  EXIST  "%25VS110COMNTOOLS%25"  CALL  "%25VS110COMNTOOLS%25vsvars32.bat"
+IF  EXIST  "%25VS100COMNTOOLS%25"  CALL  "%25VS100COMNTOOLS%25vsvars32.bat"
+
+editbin.exe /largeaddressaware "$(TargetPath)"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
