@@ -5,7 +5,7 @@ Command line and .net component for making pdfs from html, using the Mozilla Gec
 
 Basic command line:
 
-    geckofxhtmltopdf inputpath outputpath
+    GeckofxHtmlToPdf inputpath outputpath
 
 Other options:
 
@@ -23,25 +23,21 @@ Other options:
 
 NB: Currently the only units that are supported are millimeters.
 
-NB: Currently the input and output paths must precede the parameters (this appears to be a requirement of args.dll).
+NB: Currently the input and output paths must precede the parameters (this appears to be a requirement of Args.dll).
 
 ##Requirements##
 
-.Net 4.0 Runtime or mono equivalent
-
-XulRunner that matches the version of geckofx dlls (current version 29).
-Nuget to get dependencies
+.Net 4.0 Runtime or Mono equivalent
 
 ##Building##
 
-Use Nuget to pull down the commandline library.
+msbuild geckofxHtmlToPdf.sln (with any desired command line options like /p:Configuration=Release)
 
-Unzip the XulRunner directory into the distfiles directory, so that you have distfiles/xulrunner.
-[http://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/29.0/runtimes/](http://ftp.mozilla.org/pub/mozilla.org/xulrunner/releases/29.0/runtimes/)
+The build process downloads the appropriate Geckofx (and Firefox) executables using NuGet, so an Internet connection is necessary at least to get started.
 
 ##Limitation##
 
-- We use this in production desktop app and are quite happy with it. However it has one significant problem: it appears that gecko decompresses all images of the entire document into RAM, as simple bitmaps, at the same time. In large documents with many pictures (e.g. text books), this RAM exceeds how much a 32-bit program can use.  So far our customers doing these books have found that if they get their images down to 600 dpi, then there is enough RAM to create the PDF.
+- We use this in a production desktop app and are quite happy with it. However it has one significant problem: it appears that gecko decompresses all images of the entire document into RAM, as simple bitmaps, at the same time. In large documents with many pictures (e.g. text books), this RAM exceeds how much a 32-bit program can use.  So far our customers doing these books have found that if they get their images down to 600 dpi, then there is enough RAM to create the PDF.
  
 Pull requests for others command line arguments are welcome. Please follow the [wkhtmltopdf](http://code.google.com/p/wkhtmltopdf/ "wkhtmltopdf") conventions.
 

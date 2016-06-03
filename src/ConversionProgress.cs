@@ -118,38 +118,8 @@ namespace GeckofxHtmlToPdf
 			string xulRunnerPath = Environment.GetEnvironmentVariable("XULRUNNER");
 			if (String.IsNullOrEmpty(xulRunnerPath) || !Directory.Exists(xulRunnerPath))
 			{
-				xulRunnerPath = Path.Combine(DirectoryOfApplicationOrSolution, "xulrunner");
-				if (!Directory.Exists(xulRunnerPath))
-				{
-					//if this is a programmer, go look in the lib directory
-					xulRunnerPath = Path.Combine(DirectoryOfApplicationOrSolution,
-						Path.Combine("lib", "xulrunner"));
-				}
-				//on my build machine, I really like to have the dir labelled with the version.
-				//but it's a hassle to update all the other parts (installer, build machine) with this number,
-				//so we only use it if we don't find the unnumbered alternative.
-				if (!Directory.Exists(xulRunnerPath))
-				{
-					xulRunnerPath = Path.Combine(DirectoryOfApplicationOrSolution,
-						Path.Combine("lib", "xulrunner" + XulRunnerVersion));
-				}
-				if (!Directory.Exists(xulRunnerPath))
-				{
-					//or, go look in the distfiles directory
-					xulRunnerPath = Path.Combine(DirectoryOfApplicationOrSolution,
-						Path.Combine("distfiles", "xulrunner"));
-				}
-				if (!Directory.Exists(xulRunnerPath))
-				{
-					xulRunnerPath = Path.Combine(DirectoryOfApplicationOrSolution,
-						Path.Combine("distfiles", "xulrunner" + XulRunnerVersion));
-				}
-				if (!Directory.Exists(xulRunnerPath))
-				{
-					throw new Exception(String.Format("Can't find the directory where xulrunner (version {0}) is installed", XulRunnerVersion));
-				}
+				xulRunnerPath = Path.Combine(DirectoryOfTheApplicationExecutable, "Firefox");
 			}
-
 			Xpcom.Initialize(xulRunnerPath);
 
 			// Calling Xpcom.Shutdown() in this program causes a post-exit crash on

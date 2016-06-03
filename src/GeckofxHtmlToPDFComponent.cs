@@ -70,8 +70,6 @@ namespace GeckofxHtmlToPdf
 			_browser = new GeckoWebBrowser();
 			this.components.Add(_browser);//so it gets disposed when we are
 
-			_browser.JavascriptError += OnJavascriptError;
-			
 			if (conversionOrder.Debug)
 			{
 				_browser.ConsoleMessage += OnBrowserConsoleMessage;
@@ -93,14 +91,6 @@ namespace GeckofxHtmlToPdf
 			_browser.Size = new Size(1920, 1320);
 
 			_browser.Navigate(_conversionOrder.InputHtmlPath);
-		}
-
-		void OnJavascriptError(object sender, JavascriptErrorEventArgs e)
-		{
-			if (_conversionOrder.Debug)
-			{
-				Console.WriteLine("GeckofxHtmlToPdf: {0} Line {1} Position {2}: {3}",e.Filename,e.Line,e.Pos,e.Message); 
-			}
 		}
 
 		protected virtual void RaiseStatusChanged(PdfMakingStatus e)
@@ -210,7 +200,6 @@ namespace GeckofxHtmlToPdf
 			printSettings.SetMarginLeftAttribute(_conversionOrder.LeftMarginInMillimeters/kMillimetersPerInch);
 			printSettings.SetMarginRightAttribute(_conversionOrder.RightMarginInMillimeters/kMillimetersPerInch);
 
-			printSettings.SetDownloadFontsAttribute(true); //review: what's this for?
 			printSettings.SetOrientationAttribute(_conversionOrder.Landscape ? 1 : 0);
 			printSettings.SetHeaderStrCenterAttribute("");
 			printSettings.SetHeaderStrLeftAttribute("");
