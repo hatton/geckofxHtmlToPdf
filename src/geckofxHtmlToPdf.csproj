@@ -70,6 +70,9 @@
     <Reference Include="Geckofx-Winforms" Condition="'$(OS)'!='Windows_NT'">
       <HintPath>..\output\$(Configuration)\Geckofx-Winforms.dll</HintPath>
     </Reference>
+    <Reference Include="PdfSharp">
+      <HintPath>..\packages\PDFsharp.1.32.3057.0\lib\net20\PdfSharp.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -77,6 +80,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualBasic" Condition="'$(OS)'=='Windows_NT'" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
     <Reference Include="Args">
@@ -97,6 +101,7 @@
     <Compile Include="GeckofxHtmlToPDFComponent.Designer.cs">
       <DependentUpon>GeckofxHtmlToPDFComponent.cs</DependentUpon>
     </Compile>
+    <Compile Include="MemoryManagement.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

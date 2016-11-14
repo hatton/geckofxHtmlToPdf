@@ -48,6 +48,26 @@ namespace GeckofxHtmlToPdf
 		[Args.ArgsMemberSwitch("R", "-margin-right")]
 		public string RightMargin { get; set; }
 
+		[Description("Select the first page to print")]
+		[DefaultValue(0)]
+		[Args.ArgsMemberSwitch("-first-page")]
+		public int FirstPageToPrint { get; set; }
+
+		[Description("Select the last page to print")]
+		[DefaultValue(0)]
+		[Args.ArgsMemberSwitch("-last-page")]
+		public int LastPageToPrint { get; set; }
+
+		[Description("Enable single page mode")]
+		[DefaultValue(false)]
+		[Args.ArgsMemberSwitch("-single-pages")]
+		public bool SinglePageMode { get; set; }
+
+		[Description("Report memory use and time to print")]
+		[DefaultValue(false)]
+		[Args.ArgsMemberSwitch("-report-memory")]
+		public bool ReportMemoryUsage { get; set; }
+
 		private double GetMillimeters(string distance)
 		{
 			//TODO: convert to mm. For now, just strips "mm"
