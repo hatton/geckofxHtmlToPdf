@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using Gecko;
+using PdfSharp.Pdf;
+using PdfSharp.Pdf.IO;
 
 namespace GeckofxHtmlToPdf
 {
@@ -31,8 +33,17 @@ namespace GeckofxHtmlToPdf
 	{
 		private ConversionOrder _conversionOrder;
 		private GeckoWebBrowser _browser;
+		private nsIWebBrowserPrint _print;
+		private nsIPrintSettings _printSettings;
 		private string _pathToTempPdf;
 		private bool _finished;
+		private DateTime _startMakingPdf;
+		private DateTime _beginPages;
+		private int _currentPage;
+		private string _currentFile;
+		long _prevLength;
+		int _prevCount;
+
 		public event EventHandler Finished;
 		public event EventHandler<PdfMakingStatus> StatusChanged;
 		public string Status { get; private set; }
@@ -158,21 +169,21 @@ namespace GeckofxHtmlToPdf
 
 		private void StartMakingPdf()
 		{
-			nsIWebBrowserPrint print = Xpcom.QueryInterface<nsIWebBrowserPrint>(_browser.Window.DomWindow);
+			_print = Xpcom.QueryInterface<nsIWebBrowserPrint>(_browser.Window.DomWindow);
 
 			var service = Xpcom.GetService<nsIPrintSettingsService>("@mozilla.org/gfx/printsettings-service;1");
-			var printSettings = service.GetNewPrintSettingsAttribute();
+			_printSettings = service.GetNewPrintSettingsAttribute();
 
-			printSettings.SetToFileNameAttribute(_pathToTempPdf);
-			printSettings.SetPrintToFileAttribute(true);
-			printSettings.SetPrintSilentAttribute(true); //don't show a printer settings dialog
-			printSettings.SetShowPrintProgressAttribute(false);
+			_printSettings.SetToFileNameAttribute(_pathToTempPdf);
+			_printSettings.SetPrintToFileAttribute(true);
+			_printSettings.SetPrintSilentAttribute(true); //don't show a printer settings dialog
+			_printSettings.SetShowPrintProgressAttribute(false);
 
 			if (_conversionOrder.PageHeightInMillimeters > 0)
 			{
-				printSettings.SetPaperHeightAttribute(_conversionOrder.PageHeightInMillimeters);
-				printSettings.SetPaperWidthAttribute(_conversionOrder.PageWidthInMillimeters);
-				printSettings.SetPaperSizeUnitAttribute(1); //0=in, >0 = mm
+				_printSettings.SetPaperHeightAttribute(_conversionOrder.PageHeightInMillimeters);
+				_printSettings.SetPaperWidthAttribute(_conversionOrder.PageWidthInMillimeters);
+				_printSettings.SetPaperSizeUnitAttribute(1); //0=in, >0 = mm
 			}
 			else
 			{
@@ -181,52 +192,117 @@ namespace GeckofxHtmlToPdf
 
 				var size = GetPaperSize(_conversionOrder.PageSizeName);
 				const double inchesPerMillimeter = 0.0393701;	// (or more precisely, 0.0393700787402)
-				printSettings.SetPaperHeightAttribute(size.HeightInMillimeters*inchesPerMillimeter);
-				printSettings.SetPaperWidthAttribute(size.WidthInMillimeters*inchesPerMillimeter);
+				_printSettings.SetPaperHeightAttribute(size.HeightInMillimeters*inchesPerMillimeter);
+				_printSettings.SetPaperWidthAttribute(size.WidthInMillimeters*inchesPerMillimeter);
 
 			}
 
 			// BL-2346: On Linux the margins were not being set correctly due to the "unwritable margins"
 			//          which were defaulting to 0.25 inches.
-			printSettings.SetUnwriteableMarginTopAttribute(0d);
-			printSettings.SetUnwriteableMarginBottomAttribute(0d);
-			printSettings.SetUnwriteableMarginLeftAttribute(0d);
-			printSettings.SetUnwriteableMarginRightAttribute(0d);
+			_printSettings.SetUnwriteableMarginTopAttribute(0d);
+			_printSettings.SetUnwriteableMarginBottomAttribute(0d);
+			_printSettings.SetUnwriteableMarginLeftAttribute(0d);
+			_printSettings.SetUnwriteableMarginRightAttribute(0d);
 
 			//this seems to be in inches, and doesn't have a unit-setter (unlike the paper size ones)
 			const double kMillimetersPerInch = 25.4; // (or more precisely, 25.3999999999726)
-			printSettings.SetMarginTopAttribute(_conversionOrder.TopMarginInMillimeters/kMillimetersPerInch);
-			printSettings.SetMarginBottomAttribute(_conversionOrder.BottomMarginInMillimeters/kMillimetersPerInch);
-			printSettings.SetMarginLeftAttribute(_conversionOrder.LeftMarginInMillimeters/kMillimetersPerInch);
-			printSettings.SetMarginRightAttribute(_conversionOrder.RightMarginInMillimeters/kMillimetersPerInch);
+			_printSettings.SetMarginTopAttribute(_conversionOrder.TopMarginInMillimeters/kMillimetersPerInch);
+			_printSettings.SetMarginBottomAttribute(_conversionOrder.BottomMarginInMillimeters/kMillimetersPerInch);
+			_printSettings.SetMarginLeftAttribute(_conversionOrder.LeftMarginInMillimeters/kMillimetersPerInch);
+			_printSettings.SetMarginRightAttribute(_conversionOrder.RightMarginInMillimeters/kMillimetersPerInch);
 
-			printSettings.SetOrientationAttribute(_conversionOrder.Landscape ? 1 : 0);
-			printSettings.SetHeaderStrCenterAttribute("");
-			printSettings.SetHeaderStrLeftAttribute("");
-			printSettings.SetHeaderStrRightAttribute("");
-			printSettings.SetFooterStrRightAttribute("");
-			printSettings.SetFooterStrLeftAttribute("");
-			printSettings.SetFooterStrCenterAttribute("");
+			_printSettings.SetOrientationAttribute(_conversionOrder.Landscape ? 1 : 0);
+			_printSettings.SetHeaderStrCenterAttribute("");
+			_printSettings.SetHeaderStrLeftAttribute("");
+			_printSettings.SetHeaderStrRightAttribute("");
+			_printSettings.SetFooterStrRightAttribute("");
+			_printSettings.SetFooterStrLeftAttribute("");
+			_printSettings.SetFooterStrCenterAttribute("");
 
-			printSettings.SetPrintBGColorsAttribute(true);
-			printSettings.SetPrintBGImagesAttribute(true);
+			_printSettings.SetPrintBGColorsAttribute(true);
+			_printSettings.SetPrintBGImagesAttribute(true);
 
-			printSettings.SetShrinkToFitAttribute(false);
+			_printSettings.SetShrinkToFitAttribute(false);
 
 
 			//TODO: doesn't seem to do anything. Probably a problem in the geckofx wrapper
 			//printSettings.SetScalingAttribute(_conversionOrder.Zoom);
 			
-			printSettings.SetOutputFormatAttribute(2); // 2 == kOutputFormatPDF
+			_printSettings.SetOutputFormatAttribute(2); // 2 == kOutputFormatPDF
 
 			Status = "Making PDF..";
+			if (_conversionOrder.FirstPageToPrint > 0)
+			{
+				_printSettings.SetPrintRangeAttribute(1);	// print only a range of pages
+				if (_conversionOrder.LastPageToPrint < _conversionOrder.FirstPageToPrint)
+					_conversionOrder.LastPageToPrint = _conversionOrder.FirstPageToPrint;
+				_printSettings.SetStartPageRangeAttribute(_conversionOrder.FirstPageToPrint);
+				_printSettings.SetEndPageRangeAttribute(_conversionOrder.LastPageToPrint);
+			}
+			else if (_conversionOrder.SinglePageMode)
+			{
+				_printSettings.SetPrintRangeAttribute(1);	// print a range of pages
+				_printSettings.SetStartPageRangeAttribute(1);
+				_printSettings.SetEndPageRangeAttribute(1);
+				_currentPage = 1;
+				_currentFile = String.Format("{0}-page{1:000}",_pathToTempPdf, _currentPage);
+				_printSettings.SetToFileNameAttribute(_currentFile);
+				_beginPages = DateTime.Now;
+				Status = "Making Page 1 of PDF...";
+			}
 
-			print.Print(printSettings, this);
+			_startMakingPdf = DateTime.Now;
+			_print.Print(_printSettings, this);
 			_checkForPdfFinishedTimer.Enabled = true;
 		}
 
 		private void FinishMakingPdf()
 		{
+			if (_conversionOrder.ReportMemoryUsage)
+			{
+				Console.WriteLine("Making the PDF took {0}", DateTime.Now - _startMakingPdf);
+				MemoryManagement.CheckMemory(false, "Memory use after printing", false);
+			}
+			if (_conversionOrder.SinglePageMode)
+			{
+				if (!File.Exists(_currentFile))
+				{
+					throw new ApplicationException(string.Format(
+						"GeckoFxHtmlToPdf was not able to create the PDF file ({0}).{1}{1}Details: Gecko did not produce the expected document.",
+						_currentFile, Environment.NewLine));
+				}
+				// collect all the memory we can between pages
+				GC.Collect(); 
+				GC.WaitForPendingFinalizers();
+				MemoryService.MinimizeHeap(true);
+				_browser.Window.WindowUtils.GarbageCollect(null /*hopefully nulls ok*/, 0);
+
+				var length = new FileInfo(_currentFile).Length;
+				if (IsPrintingFinished(length))
+				{
+					CombinePageFilesTogether();
+					if (_conversionOrder.ReportMemoryUsage)
+					{
+						MemoryManagement.CheckMemory(false, "Memory use after combining all the pages", false);
+						Console.WriteLine("Making all the PDF pages took {0}", DateTime.Now - _beginPages);
+					}
+					RaiseFinished();
+					return;
+				}
+				++_currentPage;
+				_printSettings.SetStartPageRangeAttribute(_currentPage);
+				_printSettings.SetEndPageRangeAttribute(_currentPage);
+				_currentFile = String.Format("{0}-page{1:000}",_pathToTempPdf, _currentPage);
+				_printSettings.SetToFileNameAttribute(_currentFile);
+				_finished = false;
+				_startMakingPdf = DateTime.Now;
+				Status = String.Format("Making Page {0} of PDF...", _currentPage);
+				RaiseStatusChanged(new PdfMakingStatus() { percentage = 0, statusLabel = Status });
+				_print.Print(_printSettings, this);
+				_checkForPdfFinishedTimer.Enabled = true;
+				return;
+			}
+
 			if (!File.Exists(_pathToTempPdf))
 				throw new ApplicationException(string.Format(
 					"GeckoFxHtmlToPdf was not able to create the PDF file ({0}).{1}{1}Details: Gecko did not produce the expected document.",
@@ -245,6 +321,72 @@ namespace GeckofxHtmlToPdf
 						"Tried to move the file {0} to {1}, but the Operating System said that one of these files was locked. Please try again.{2}{2}Details: {3}",
 						_pathToTempPdf, _conversionOrder.OutputPdfPath, Environment.NewLine, e.Message));
 			}
+		}
+
+		private bool IsPrintingFinished(long length)
+		{
+			// (On Linux?) the end of the book is sometimes marked by a zero sized file being output for the nonexistent page.
+			if (length == 0)
+			{
+				File.Delete(_currentFile);
+				return true;
+			}
+			// Otherwise, nonexistent pages off the end of the book produce very small identical empty page files.
+			// (For Geckofx45, these empty page files are 833 bytes on Linux and 843 bytes on Windows.)
+			// heuristic: 5 consecutive very small files the same size must mark the end of the book.
+			if (length < 850)
+			{
+				if (length == _prevLength)
+				{
+					++_prevCount;
+					if (_prevCount < 4)
+						return false;
+					// Delete the empty files at the end.
+					for (int i = _currentPage - _prevCount; i <= _currentPage; ++i)
+					{
+						var file = String.Format("{0}-page{1:000}",_pathToTempPdf, i);
+						File.Delete(file);
+					}
+					return true;
+				}
+			}
+			_prevLength = length;
+			_prevCount = 0;
+			return false;
+		}
+
+		private void CombinePageFilesTogether()
+		{
+			var filenames = GetPageFilenames();
+			PdfDocument outputDocument = new PdfDocument();
+			Status = "Combining pages into final PDF file...";
+			for (int i = 0; i < filenames.Count; ++i)
+			{
+				RaiseStatusChanged(new PdfMakingStatus() { percentage = (int)((float)i / (float)filenames.Count), statusLabel = Status });
+				var file = filenames[i];
+				PdfDocument inputDocument = PdfReader.Open(file, PdfDocumentOpenMode.Import);
+				System.Diagnostics.Debug.Assert(inputDocument.PageCount == 1);
+				PdfPage page = inputDocument.Pages[0];
+				outputDocument.AddPage(page);
+			}
+			outputDocument.Save(_conversionOrder.OutputPdfPath);
+			// remove the page files that are no longer needed
+			foreach (string file in filenames)
+				File.Delete(file);
+		}
+
+		private List<string> GetPageFilenames()
+		{
+			var filenames = new List<string>();
+			var nameToMatch =  Path.GetFileName(_pathToTempPdf) + "-page";
+			var info = new DirectoryInfo(Path.GetDirectoryName(_pathToTempPdf));
+			foreach (var file in info.GetFiles())
+			{
+				if (file.Name.StartsWith(nameToMatch))
+					filenames.Add(file.FullName);
+			}
+			filenames.Sort();
+			return filenames;
 		}
 
 		private void OnCheckForBrowserNavigatedTimerTick(object sender, EventArgs e)
@@ -282,6 +424,8 @@ namespace GeckofxHtmlToPdf
 
 			// if we use the maxTotalProgress, the problem is that it starts off below 100, the jumps to 100 at the end
 			// so it looks a lot better to just always scale, to 100, the current progress by the max at that point
+			if (maxTotalProgress < currentTotalProgress)
+				maxTotalProgress = currentTotalProgress;	// sanity check
 			RaiseStatusChanged(new PdfMakingStatus()
 				{
 					percentage = (int) (100.0*(currentTotalProgress)/maxTotalProgress),
