@@ -239,7 +239,7 @@ namespace GeckofxHtmlToPdf
 				_printSettings.SetStartPageRangeAttribute(_conversionOrder.FirstPageToPrint);
 				_printSettings.SetEndPageRangeAttribute(_conversionOrder.LastPageToPrint);
 			}
-			else if (_conversionOrder.SinglePageMode)
+			else if (_conversionOrder.ReduceMemoryUse)
 			{
 				_printSettings.SetPrintRangeAttribute(1);	// print a range of pages
 				_printSettings.SetStartPageRangeAttribute(1);
@@ -263,7 +263,7 @@ namespace GeckofxHtmlToPdf
 				Console.WriteLine("Making the PDF took {0}", DateTime.Now - _startMakingPdf);
 				MemoryManagement.CheckMemory(false, "Memory use after printing", false);
 			}
-			if (_conversionOrder.SinglePageMode)
+			if (_conversionOrder.ReduceMemoryUse)
 			{
 				if (!File.Exists(_currentFile))
 				{

@@ -58,10 +58,10 @@ namespace GeckofxHtmlToPdf
 		[Args.ArgsMemberSwitch("-last-page")]
 		public int LastPageToPrint { get; set; }
 
-		[Description("Enable single page mode")]
+		[Description("Enable memory saver mode")]
 		[DefaultValue(false)]
-		[Args.ArgsMemberSwitch("-single-pages")]
-		public bool SinglePageMode { get; set; }
+		[Args.ArgsMemberSwitch("-reduce-memory-use")]
+		public bool ReduceMemoryUse { get; set; }
 
 		[Description("Report memory use and time to print")]
 		[DefaultValue(false)]

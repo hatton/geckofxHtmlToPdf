@@ -37,6 +37,6 @@ export HGRCPATH=
 unset XMODIFIERS
 
 time /opt/mono4-sil/bin/mono --runtime=v4.0 --debug output/Debug/GeckofxHtmlToPdf.exe "${BASE}/test/letterSpacingTest.html" output/letterSpacingTest.pdf --report-memory >test.output
-time /opt/mono4-sil/bin/mono --runtime=v4.0 --debug output/Debug/GeckofxHtmlToPdf.exe "${BASE}/test/letterSpacingTest.html" output/letterSpacingTest-single.pdf --single-pages --report-memory >>test.output
+time /opt/mono4-sil/bin/mono --runtime=v4.0 --debug output/Debug/GeckofxHtmlToPdf.exe "${BASE}/test/letterSpacingTest.html" output/letterSpacingTest-single.pdf --reduce-memory-use --report-memory >>test.output
 time /opt/mono4-sil/bin/mono --runtime=v4.0 --debug output/Debug/GeckofxHtmlToPdf.exe "${BASE}/test/Portable Document Format - Wikipedia.htm" output/pdf-wiki.pdf --report-memory >>test.output
-time /opt/mono4-sil/bin/mono --runtime=v4.0 --debug output/Debug/GeckofxHtmlToPdf.exe "${BASE}/test/Portable Document Format - Wikipedia.htm" output/pdf-wiki-single.pdf --single-pages --report-memory >>test.output
+time /opt/mono4-sil/bin/mono --runtime=v4.0 --debug output/Debug/GeckofxHtmlToPdf.exe "${BASE}/test/Portable Document Format - Wikipedia.htm" output/pdf-wiki-single.pdf --reduce-memory-use --report-memory >>test.output
