@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GeckofxHtmlToPdf</RootNamespace>
     <AssemblyName>GeckofxHtmlToPdf</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -56,11 +56,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Geckofx-Core" Condition="'$(OS)'=='Windows_NT'">
-      <HintPath>..\packages\Geckofx45.45.0.19.0\lib\net40\Geckofx-Core.dll</HintPath>
+      <HintPath>..\packages\Geckofx45.45.0.28\lib\net45\Geckofx-Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Geckofx-Winforms" Condition="'$(OS)'=='Windows_NT'">
-      <HintPath>..\packages\Geckofx45.45.0.19.0\lib\net40\Geckofx-Winforms.dll</HintPath>
+      <HintPath>..\packages\Geckofx45.45.0.28\lib\net45\Geckofx-Winforms.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <!-- cannot use packages hintpath for Linux Geckofx45 because 32-bit and 64-bit builds differ -->
@@ -128,8 +128,8 @@
   </Target>
   <Target Name="AfterBuild" Condition="'$(OS)'=='Windows_NT'">
     <!-- copy the Geckofx45/Firefox files to the output directory, first creating the directory if necessary -->
-    <Exec Command="mkdir $(OutDir)Firefox" Condition="!Exists('$(OutDir)Firefox')"/>
-    <Exec Command="copy /Y $(SolutionDir)packages\Geckofx45.45.0.19.0\content\Firefox\*.* $(OutDir)Firefox"/>
+    <Exec Command="mkdir $(OutDir)Firefox" Condition="!Exists('$(OutDir)Firefox')" />
+    <Exec Command="copy /Y $(SolutionDir)packages\Geckofx45.45.0.28\content\Firefox\*.* $(OutDir)Firefox" />
   </Target>
   <PropertyGroup Condition="'$(OS)'=='Windows_NT'">
     <PostBuildEvent Condition="'$(VS100COMNTOOLS)'!=''">"$(VS100COMNTOOLS)..\..\VC\bin\editbin.exe" /largeaddressaware "$(TargetPath)"</PostBuildEvent>
@@ -144,7 +144,7 @@ IF  EXIST  "%25VS100COMNTOOLS%25"  CALL  "%25VS100COMNTOOLS%25vsvars32.bat"
 
 editbin.exe /largeaddressaware "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
