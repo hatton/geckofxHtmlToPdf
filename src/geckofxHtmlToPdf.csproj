@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -124,7 +124,8 @@
     <!-- copy the appropriate Geckofx45 files to the output directory, first creating the directory if necessary -->
     <!-- this cannot be done in BeforeBuild, because the nuget download occurs as part of Build after BeforeBuild -->
     <Exec Command="mkdir -p $(OutDir)" />
-    <Exec Command="if [ &quot;`arch`&quot; = &quot;x86_64&quot; ]; then find $(SolutionDir)packages/Geckofx45.64.Linux.45.0.17.0 -name 'Geckofx-*.*' -exec cp -pvn '{}' $(OutDir) ';' &amp;&amp; find $(SolutionDir)packages/Geckofx45.64.Linux.45.0.17.0 -name Firefox -type d -exec cp -pRvn '{}' $(OutDir) ';'; else find $(SolutionDir)packages/Geckofx45.32.Linux.45.0.17.0 -name 'Geckofx-*.*' -exec cp -pvn '{}' $(OutDir) ';' &amp;&amp; find $(SolutionDir)packages/Geckofx45.32.Linux.45.0.17.0 -name Firefox -type d -exec cp -pRvn '{}' $(OutDir) ';'; fi" />
+    <Exec Command="rm -rf $(OutDir)Firefox" />
+    <Exec Command="if [ &quot;`arch`&quot; = &quot;x86_64&quot; ]; then find $(SolutionDir)packages/Geckofx45.64.Linux.45.0.23.0 -name 'Geckofx-*.*' -exec cp -pvn '{}' $(OutDir) ';' &amp;&amp; find $(SolutionDir)packages/Geckofx45.64.Linux.45.0.23.0 -name 'Firefox*' -type d -exec cp -pRvn '{}' $(OutDir)Firefox ';'; else find $(SolutionDir)packages/Geckofx45.32.Linux.45.0.23.0 -name 'Geckofx-*.*' -exec cp -pvn '{}' $(OutDir) ';' &amp;&amp; find $(SolutionDir)packages/Geckofx45.32.Linux.45.0.23.0 -name 'Firefox*' -type d -exec cp -pRvn '{}' $(OutDir)Firefox ';'; fi" />
   </Target>
   <Target Name="AfterBuild" Condition="'$(OS)'=='Windows_NT'">
     <!-- copy the Geckofx45/Firefox files to the output directory, first creating the directory if necessary -->
