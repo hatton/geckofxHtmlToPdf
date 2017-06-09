@@ -23,12 +23,25 @@ namespace GeckofxHtmlToPdf
 			_conversionOrder = conversionOrder;
 			InitializeComponent();
 			_progressBar.Maximum = 100;
-			if (conversionOrder.NoUIMode)
+			if (_conversionOrder.NoUIMode)
 			{
 				this.WindowState = FormWindowState.Minimized;
 				this.ShowInTaskbar = false;
+				// Setting the WindowState doesn't suffice on Linux/Mono.  So we'll make the form
+				// invisible as soon as it is shown.  (This isn't needed on Windows.)
+				if (Environment.OSVersion.Platform == PlatformID.Unix)
+					this.Shown += ConversionProgress_Shown;
 			}
 			SetUpXulRunner();
+		}
+
+		private void ConversionProgress_Shown(object sender, EventArgs e)
+		{
+			// Setting WindowState=Minimized gets reversed on Linux.  So does setting
+			// Visible=false if set earlier (including in CP_Load).  But Minimized gets
+			// reversed after this method so we need to set Visible.
+			if (_conversionOrder.NoUIMode)
+				this.Visible = false;
 		}
 
 		private void ConversionProgress_Load(object sender, EventArgs e)
@@ -39,20 +52,35 @@ namespace GeckofxHtmlToPdf
 
 		void OnPdfMaker_Finished(object sender, EventArgs e)
 		{
-			_statusLabel.Text = "Finished";
-			
-			//on windows 7 (at least) you won't see 100% if you close before the system has had a chance to "animate" the increase. 
-			//On very short documents, you won't see it get past around 20%. Now good. So, the
-			//trick here is to go *down* to 99, that going downwards makes it skip the animation delay.
-			_progressBar.Value = 100;
-			_progressBar.Value = 99;		
+			if (_conversionOrder.NoUIMode)
+			{
+				Console.WriteLine("Status: Finished|Percent: 100");
+			}
+			else
+			{
+				_statusLabel.Text = "Finished";
+
+				//on windows 7 (at least) you won't see 100% if you close before the system has had a chance to "animate" the increase. 
+				//On very short documents, you won't see it get past around 20%. Now good. So, the
+				//trick here is to go *down* to 99, that going downwards makes it skip the animation delay.
+				_progressBar.Value = 100;
+				_progressBar.Value = 99;
+			}
 			Close();
 		}
 
 		private void OnPdfMaker_StatusChanged(object sender, PdfMakingStatus pdfMakingStatus)
 		{
-			_statusLabel.Text = pdfMakingStatus.statusLabel;
-			_progressBar.Value = pdfMakingStatus.percentage;
+			if (_conversionOrder.NoUIMode)
+			{
+				// Write the status to stdout in easily parseable form.  (BL-3271)
+				Console.WriteLine("Status: {0}|Percent: {1}", pdfMakingStatus.statusLabel, pdfMakingStatus.percentage);
+			}
+			else
+			{
+				_statusLabel.Text = pdfMakingStatus.statusLabel;
+				_progressBar.Value = pdfMakingStatus.percentage;
+			}
 		}
 
 		#region FindingXulRunner
