@@ -138,10 +138,11 @@
     <PostBuildEvent Condition="'$(VS120COMNTOOLS)'!=''">"$(VS120COMNTOOLS)..\..\VC\bin\editbin.exe" /largeaddressaware "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent Condition="'$(OS)'=='Windows_NT'">IF  EXIST  "%25VS140COMNTOOLS%25"  CALL  "%25VS140COMNTOOLS%25vsvars32.bat"
-IF  EXIST  "%25VS120COMNTOOLS%25"  CALL  "%25VS120COMNTOOLS%25vsvars32.bat"
-IF  EXIST  "%25VS110COMNTOOLS%25"  CALL  "%25VS110COMNTOOLS%25vsvars32.bat"
-IF  EXIST  "%25VS100COMNTOOLS%25"  CALL  "%25VS100COMNTOOLS%25vsvars32.bat"
+    <PostBuildEvent Condition="'$(OS)'=='Windows_NT'">
+IF  EXIST  "%25VS140COMNTOOLS%25"  CALL  "%25VS140COMNTOOLS%25vsvars32.bat"
+ELSE IF  EXIST  "%25VS120COMNTOOLS%25"  CALL  "%25VS120COMNTOOLS%25vsvars32.bat"
+ELSE IF  EXIST  "%25VS110COMNTOOLS%25"  CALL  "%25VS110COMNTOOLS%25vsvars32.bat"
+ELSE IF  EXIST  "%25VS100COMNTOOLS%25"  CALL  "%25VS100COMNTOOLS%25vsvars32.bat"
 
 editbin.exe /largeaddressaware "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
