@@ -77,6 +77,14 @@ namespace GeckofxHtmlToPdf
 			if (conversionOrder.EnableGraphite)
 				GeckoPreferences.User["gfx.font_rendering.graphite.enabled"] = true;
 
+			// geckofx can sometimes cache stale data, at least on Windows.  These settings should prevent
+			// any caching (which we don't need anyway) from happening.
+			// See https://silbloom.myjetbrains.com/youtrack/issue/BL-5875 for details.
+			GeckoPreferences.User["browser.cache.disk.enable"] = false;
+			GeckoPreferences.User["browser.cache.memory.enable"] = false;
+			GeckoPreferences.User["browser.cache.offline.enable"] = false;
+			GeckoPreferences.User["dom.caches.enable"] = false;
+
 			_conversionOrder = conversionOrder;
 			_browser = new GeckoWebBrowser();
 			this.components.Add(_browser);//so it gets disposed when we are
