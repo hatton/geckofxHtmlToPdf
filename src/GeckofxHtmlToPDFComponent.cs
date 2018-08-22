@@ -163,7 +163,7 @@ namespace GeckofxHtmlToPdf
 			var service = Xpcom.GetService<nsIPrintSettingsService>("@mozilla.org/gfx/printsettings-service;1");
 			var printSettings = service.GetNewPrintSettingsAttribute();
 
-			printSettings.SetToFileNameAttribute(_pathToTempPdf);
+			printSettings.SetToFileNameAttribute(new Gecko.nsAString(_pathToTempPdf));
 			printSettings.SetPrintToFileAttribute(true);
 			printSettings.SetPrintSilentAttribute(true); //don't show a printer settings dialog
 			printSettings.SetShowPrintProgressAttribute(false);
@@ -201,12 +201,12 @@ namespace GeckofxHtmlToPdf
 			printSettings.SetMarginRightAttribute(_conversionOrder.RightMarginInMillimeters/kMillimetersPerInch);
 
 			printSettings.SetOrientationAttribute(_conversionOrder.Landscape ? 1 : 0);
-			printSettings.SetHeaderStrCenterAttribute("");
-			printSettings.SetHeaderStrLeftAttribute("");
-			printSettings.SetHeaderStrRightAttribute("");
-			printSettings.SetFooterStrRightAttribute("");
-			printSettings.SetFooterStrLeftAttribute("");
-			printSettings.SetFooterStrCenterAttribute("");
+//			printSettings.SetHeaderStrCenterAttribute("");
+//			printSettings.SetHeaderStrLeftAttribute("");
+//			printSettings.SetHeaderStrRightAttribute("");
+//			printSettings.SetFooterStrRightAttribute("");
+//			printSettings.SetFooterStrLeftAttribute("");
+//			printSettings.SetFooterStrCenterAttribute("");
 
 			printSettings.SetPrintBGColorsAttribute(true);
 			printSettings.SetPrintBGImagesAttribute(true);

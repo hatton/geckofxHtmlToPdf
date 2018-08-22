@@ -5,3 +5,8 @@ packages
 obj
 *.tmp
 test/*.pdf
+
+\.vs
+.nuget/NuGet.exe
+.nuget/nuget.exe
+src/Firefox
