@@ -6,4 +6,7 @@ obj
 *.tmp
 test/*.pdf
 *.suo
+\.vs
 .nuget/NuGet.exe
+.nuget/nuget.exe
+src/Firefox

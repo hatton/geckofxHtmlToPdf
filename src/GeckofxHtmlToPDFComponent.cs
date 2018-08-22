@@ -17,12 +17,12 @@ namespace GeckofxHtmlToPdf
 	 * using geckofx in their main project. But for me, it's not worth maintaining/documenting at this
 	 * point, as my client app is going to have to use this as a command-line. Note, Hindle couldn't
 	 * reproduce this in the geckofx sample app, so there's a mystery to be solved some day.
-	 * 
+	 *
 	 * Why is this a component? Only becuase the geckobrowser that we use, even though it is invisible,
 	* expects to be operating on the UI thread, getting events from the Application.DoEvents() loop, etc.
 	* So we can't be making pdfs on a background thread. Having it as a component with a timer and
 	* an event to signal when it is done makes it easy for programmer incorporating this see how to use it properly.
-	 * 
+	 *
 	 * This component is used by the ConversionProgress form in this assembly for when the exe is used
 	 * on the command line. But it can also be used by any other winforms app that references our assembly
 	 * (even though it is an exe, not the usual dll). Just drag the component onto some other form, then
@@ -93,10 +93,10 @@ namespace GeckofxHtmlToPdf
 			{
 				_browser.ConsoleMessage += OnBrowserConsoleMessage;
 			}
-			
+
 			var tempFileName = Path.GetTempFileName();
 			File.Delete(tempFileName);
-			_pathToTempPdf = tempFileName + ".pdf"; 
+			_pathToTempPdf = tempFileName + ".pdf";
 			File.Delete(_conversionOrder.OutputPdfPath);
 			_checkForBrowserNavigatedTimer.Enabled = true;
 			Status = "Loading Html...";
@@ -182,7 +182,7 @@ namespace GeckofxHtmlToPdf
 			var service = Xpcom.GetService<nsIPrintSettingsService>("@mozilla.org/gfx/printsettings-service;1");
 			_printSettings = service.GetNewPrintSettingsAttribute();
 
-			_printSettings.SetToFileNameAttribute(_pathToTempPdf);
+			_printSettings.SetToFileNameAttribute(new Gecko.nsAString(_pathToTempPdf));
 			_printSettings.SetPrintToFileAttribute(true);
 			_printSettings.SetPrintSilentAttribute(true); //don't show a printer settings dialog
 			_printSettings.SetShowPrintProgressAttribute(false);
@@ -220,12 +220,12 @@ namespace GeckofxHtmlToPdf
 			_printSettings.SetMarginRightAttribute(_conversionOrder.RightMarginInMillimeters/kMillimetersPerInch);
 
 			_printSettings.SetOrientationAttribute(_conversionOrder.Landscape ? 1 : 0);
-			_printSettings.SetHeaderStrCenterAttribute("");
-			_printSettings.SetHeaderStrLeftAttribute("");
-			_printSettings.SetHeaderStrRightAttribute("");
-			_printSettings.SetFooterStrRightAttribute("");
-			_printSettings.SetFooterStrLeftAttribute("");
-			_printSettings.SetFooterStrCenterAttribute("");
+//			printSettings.SetHeaderStrCenterAttribute("");
+//			printSettings.SetHeaderStrLeftAttribute("");
+//			printSettings.SetHeaderStrRightAttribute("");
+//			printSettings.SetFooterStrRightAttribute("");
+//			printSettings.SetFooterStrLeftAttribute("");
+//			printSettings.SetFooterStrCenterAttribute("");
 
 			_printSettings.SetPrintBGColorsAttribute(true);
 			_printSettings.SetPrintBGImagesAttribute(true);
@@ -235,7 +235,7 @@ namespace GeckofxHtmlToPdf
 
 			//TODO: doesn't seem to do anything. Probably a problem in the geckofx wrapper
 			//printSettings.SetScalingAttribute(_conversionOrder.Zoom);
-			
+
 			_printSettings.SetOutputFormatAttribute(2); // 2 == kOutputFormatPDF
 
 			Status = "Making PDF..";
@@ -254,7 +254,7 @@ namespace GeckofxHtmlToPdf
 				_printSettings.SetEndPageRangeAttribute(1);
 				_currentPage = 1;
 				_currentFile = String.Format("{0}-page{1:000}",_pathToTempPdf, _currentPage);
-				_printSettings.SetToFileNameAttribute(_currentFile);
+				_printSettings.SetToFileNameAttribute(new Gecko.nsAString(_currentFile));
 				_beginPages = DateTime.Now;
 				Status = "Making Page 1 of PDF...";
 			}
@@ -280,7 +280,7 @@ namespace GeckofxHtmlToPdf
 						_currentFile, Environment.NewLine));
 				}
 				// collect all the memory we can between pages
-				GC.Collect(); 
+				GC.Collect();
 				GC.WaitForPendingFinalizers();
 				MemoryService.MinimizeHeap(true);
 				_browser.Window.WindowUtils.GarbageCollect(null /*hopefully nulls ok*/, 0);
@@ -301,7 +301,7 @@ namespace GeckofxHtmlToPdf
 				_printSettings.SetStartPageRangeAttribute(_currentPage);
 				_printSettings.SetEndPageRangeAttribute(_currentPage);
 				_currentFile = String.Format("{0}-page{1:000}",_pathToTempPdf, _currentPage);
-				_printSettings.SetToFileNameAttribute(_currentFile);
+				_printSettings.SetToFileNameAttribute(new Gecko.nsAString(_currentFile));
 				_finished = false;
 				_startMakingPdf = DateTime.Now;
 				Status = String.Format("Making Page {0} of PDF...", _currentPage);
