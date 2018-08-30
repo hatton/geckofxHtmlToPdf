@@ -62,6 +62,12 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- cannot use packages hintpath for Linux Geckofx45 because 32-bit and 64-bit builds differ -->
+    <Reference Include="Geckofx-Core, Version=60.0.11.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86">
+      <HintPath>..\packages\Geckofx60.32.60.0.11-alpha\lib\net45\Geckofx-Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Geckofx-Winforms, Version=60.0.11.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86">
+      <HintPath>..\packages\Geckofx60.32.60.0.11-alpha\lib\net45\Geckofx-Winforms.dll</HintPath>
+    </Reference>
     <Reference Include="PdfSharp">
       <HintPath>..\packages\PDFsharp.1.32.3057.0\lib\net20\PdfSharp.dll</HintPath>
     </Reference>
