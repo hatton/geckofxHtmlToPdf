@@ -62,11 +62,11 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- cannot use packages hintpath for Linux Geckofx45 because 32-bit and 64-bit builds differ -->
-    <Reference Include="Geckofx-Core, Version=60.0.11.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86">
-      <HintPath>..\packages\Geckofx60.32.60.0.11-alpha\lib\net45\Geckofx-Core.dll</HintPath>
+    <Reference Include="Geckofx-Core, Version=60.0.12.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86">
+      <HintPath>..\packages\Geckofx60.32.60.0.12-alpha\lib\net45\Geckofx-Core.dll</HintPath>
     </Reference>
-    <Reference Include="Geckofx-Winforms, Version=60.0.11.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86">
-      <HintPath>..\packages\Geckofx60.32.60.0.11-alpha\lib\net45\Geckofx-Winforms.dll</HintPath>
+    <Reference Include="Geckofx-Winforms, Version=60.0.12.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86">
+      <HintPath>..\packages\Geckofx60.32.60.0.12-alpha\lib\net45\Geckofx-Winforms.dll</HintPath>
     </Reference>
     <Reference Include="PdfSharp">
       <HintPath>..\packages\PDFsharp.1.32.3057.0\lib\net20\PdfSharp.dll</HintPath>
@@ -165,12 +165,12 @@
     <!---->
     <!--editbin.exe /largeaddressaware "$(TargetPath)"</PostBuildEvent>-->
   </PropertyGroup>
-  <Import Project="..\packages\Geckofx60.32.60.0.11-alpha\build\Geckofx60.32.targets" Condition="Exists('..\packages\Geckofx60.32.60.0.11-alpha\build\Geckofx60.32.targets')" />
+  <Import Project="..\packages\Geckofx60.32.60.0.12-alpha\build\Geckofx60.32.targets" Condition="Exists('..\packages\Geckofx60.32.60.0.12-alpha\build\Geckofx60.32.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Geckofx60.32.60.0.11-alpha\build\Geckofx60.32.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Geckofx60.32.60.0.11-alpha\build\Geckofx60.32.targets'))" />
+    <Error Condition="!Exists('..\packages\Geckofx60.32.60.0.12-alpha\build\Geckofx60.32.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Geckofx60.32.60.0.12-alpha\build\Geckofx60.32.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
