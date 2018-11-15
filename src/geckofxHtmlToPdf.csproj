@@ -61,12 +61,18 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <!-- cannot use packages hintpath for Linux Geckofx45 because 32-bit and 64-bit builds differ -->
-    <Reference Include="Geckofx-Core, Version=60.0.18.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86">
+    <Reference Include="Geckofx-Core, Version=60.0.18.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86" Condition="'$(OS)'=='Windows_NT'">
       <HintPath>..\packages\Geckofx60.32.60.0.18\lib\net45\Geckofx-Core.dll</HintPath>
     </Reference>
-    <Reference Include="Geckofx-Winforms, Version=60.0.18.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86">
+    <Reference Include="Geckofx-Winforms, Version=60.0.18.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86" Condition="'$(OS)'=='Windows_NT'">
       <HintPath>..\packages\Geckofx60.32.60.0.18\lib\net45\Geckofx-Winforms.dll</HintPath>
+    </Reference>
+    <!-- cannot use packages hintpath for Linux Geckofx because 32-bit and 64-bit builds differ -->
+    <Reference Include="Geckofx-Core" Condition="'$(OS)'!='Windows_NT'">
+      <HintPath>..\output\$(Configuration)\Geckofx-Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Geckofx-Winforms" Condition="'$(OS)'!='Windows_NT'">
+      <HintPath>..\output\$(Configuration)\Geckofx-Winforms.dll</HintPath>
     </Reference>
     <Reference Include="PdfSharp">
       <HintPath>..\packages\PDFsharp.1.32.3057.0\lib\net20\PdfSharp.dll</HintPath>
@@ -141,17 +147,13 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <!--  <Target Name="BeforeResolveReferences" Condition="'$(OS)'!='Windows_NT'">-->
-  <!--    ~1~ copy the appropriate Geckofx45 files to the output directory, first creating the directory if necessary @1@-->
-  <!--    ~1~ this cannot be done in BeforeBuild, because the nuget download occurs as part of Build after BeforeBuild @1@-->
-  <!--    <Exec Command="mkdir -p $(OutDir)" />-->
-  <!--    <Exec Command="if [ &quot;`arch`&quot; = &quot;x86_64&quot; ]; then find $(SolutionDir)packages/Geckofx45.64.Linux.45.0.17.0 -name 'Geckofx-*.*' -exec cp -pvn '{}' $(OutDir) ';' &amp;&amp; find $(SolutionDir)packages/Geckofx45.64.Linux.45.0.17.0 -name Firefox -type d -exec cp -pRvn '{}' $(OutDir) ';'; else find $(SolutionDir)packages/Geckofx45.32.Linux.45.0.17.0 -name 'Geckofx-*.*' -exec cp -pvn '{}' $(OutDir) ';' &amp;&amp; find $(SolutionDir)packages/Geckofx45.32.Linux.45.0.17.0 -name Firefox -type d -exec cp -pRvn '{}' $(OutDir) ';'; fi" />-->
-  <!--  </Target>-->
-  <!--  <Target Name="AfterBuild" Condition="'$(OS)'=='Windows_NT'">-->
-  <!--    ~1~ copy the Geckofx45/Firefox files to the output directory, first creating the directory if necessary @1@-->
-  <!--    <Exec Command="mkdir $(OutDir)Firefox" Condition="!Exists('$(OutDir)Firefox')" />-->
-  <!--    <Exec Command="copy /Y $(SolutionDir)packages\Geckofx45.45.0.19.0\content\Firefox\*.* $(OutDir)Firefox" />-->
-  <!--  </Target>-->
+  <Target Name="BeforeResolveReferences" Condition="'$(OS)'!='Windows_NT'">
+    <!-- copy the appropriate Geckofx files to the output directory, first creating the directory if necessary -->
+    <!-- this cannot be done in BeforeBuild, because the nuget download occurs as part of Build after BeforeBuild -->
+    <Exec Command="mkdir -p $(OutDir)" />
+    <Exec Command="rm -rf $(OutDir)Firefox" />
+    <Exec Command="if [ &quot;`arch`&quot; = &quot;x86_64&quot; ]; then find $(SolutionDir)packages/Geckofx60.64.Linux.60.0.17 -name 'Geckofx-*.*' -exec cp -pvn '{}' $(OutDir) ';' &amp;&amp; find $(SolutionDir)packages/Geckofx60.64.Linux.60.0.17 -name Firefox* -type d -exec cp -pRvn '{}' $(OutDir)/Firefox ';'; else find $(SolutionDir)packages/Geckofx60.32.Linux.60.0.17 -name 'Geckofx-*.*' -exec cp -pvn '{}' $(OutDir) ';' &amp;&amp; find $(SolutionDir)packages/Geckofx60.32.Linux.60.0.17 -name Firefox* -type d -exec cp -pRvn '{}' $(OutDir)/Firefox ';'; fi" />
+  </Target>
   <PropertyGroup Condition="'$(OS)'=='Windows_NT'">
     <PostBuildEvent Condition="'$(VS100COMNTOOLS)'!=''">"$(VS100COMNTOOLS)..\..\VC\bin\editbin.exe" /largeaddressaware "$(TargetPath)"</PostBuildEvent>
     <PostBuildEvent Condition="'$(VS110COMNTOOLS)'!=''">"$(VS110COMNTOOLS)..\..\VC\bin\editbin.exe" /largeaddressaware "$(TargetPath)"</PostBuildEvent>
@@ -166,7 +168,7 @@
     <!--editbin.exe /largeaddressaware "$(TargetPath)"</PostBuildEvent>-->
   </PropertyGroup>
   <Import Project="..\packages\Geckofx60.32.60.0.18\build\Geckofx60.32.targets" Condition="Exists('..\packages\Geckofx60.32.60.0.18\build\Geckofx60.32.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild" Condition="'$(OS)'=='Windows_NT'">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
