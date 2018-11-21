@@ -61,11 +61,11 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Geckofx-Core, Version=60.0.18.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86" Condition="'$(OS)'=='Windows_NT'">
-      <HintPath>..\packages\Geckofx60.32.60.0.18\lib\net45\Geckofx-Core.dll</HintPath>
+    <Reference Include="Geckofx-Core, Version=60.0.22.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86" Condition="'$(OS)'=='Windows_NT'">
+      <HintPath>..\packages\Geckofx60.32.60.0.22\lib\net45\Geckofx-Core.dll</HintPath>
     </Reference>
-    <Reference Include="Geckofx-Winforms, Version=60.0.18.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86" Condition="'$(OS)'=='Windows_NT'">
-      <HintPath>..\packages\Geckofx60.32.60.0.18\lib\net45\Geckofx-Winforms.dll</HintPath>
+    <Reference Include="Geckofx-Winforms, Version=60.0.22.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86" Condition="'$(OS)'=='Windows_NT'">
+      <HintPath>..\packages\Geckofx60.32.60.0.22\lib\net45\Geckofx-Winforms.dll</HintPath>
     </Reference>
     <!-- cannot use packages hintpath for Linux Geckofx because 32-bit and 64-bit builds differ -->
     <Reference Include="Geckofx-Core" Condition="'$(OS)'!='Windows_NT'">
@@ -167,12 +167,12 @@
     <!---->
     <!--editbin.exe /largeaddressaware "$(TargetPath)"</PostBuildEvent>-->
   </PropertyGroup>
-  <Import Project="..\packages\Geckofx60.32.60.0.18\build\Geckofx60.32.targets" Condition="Exists('..\packages\Geckofx60.32.60.0.18\build\Geckofx60.32.targets')" />
+  <Import Project="..\packages\Geckofx60.32.60.0.22\build\Geckofx60.32.targets" Condition="Exists('..\packages\Geckofx60.32.60.0.22\build\Geckofx60.32.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild" Condition="'$(OS)'=='Windows_NT'">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Geckofx60.32.60.0.18\build\Geckofx60.32.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Geckofx60.32.60.0.18\build\Geckofx60.32.targets'))" />
+    <Error Condition="!Exists('..\packages\Geckofx60.32.60.0.22\build\Geckofx60.32.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Geckofx60.32.60.0.22\build\Geckofx60.32.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
