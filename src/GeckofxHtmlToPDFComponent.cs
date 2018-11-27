@@ -17,12 +17,12 @@ namespace GeckofxHtmlToPdf
 	 * using geckofx in their main project. But for me, it's not worth maintaining/documenting at this
 	 * point, as my client app is going to have to use this as a command-line. Note, Hindle couldn't
 	 * reproduce this in the geckofx sample app, so there's a mystery to be solved some day.
-	 * 
+	 *
 	 * Why is this a component? Only becuase the geckobrowser that we use, even though it is invisible,
 	* expects to be operating on the UI thread, getting events from the Application.DoEvents() loop, etc.
 	* So we can't be making pdfs on a background thread. Having it as a component with a timer and
 	* an event to signal when it is done makes it easy for programmer incorporating this see how to use it properly.
-	 * 
+	 *
 	 * This component is used by the ConversionProgress form in this assembly for when the exe is used
 	 * on the command line. But it can also be used by any other winforms app that references our assembly
 	 * (even though it is an exe, not the usual dll). Just drag the component onto some other form, then
@@ -93,10 +93,10 @@ namespace GeckofxHtmlToPdf
 			{
 				_browser.ConsoleMessage += OnBrowserConsoleMessage;
 			}
-			
+
 			var tempFileName = Path.GetTempFileName();
 			File.Delete(tempFileName);
-			_pathToTempPdf = tempFileName + ".pdf"; 
+			_pathToTempPdf = tempFileName + ".pdf";
 			File.Delete(_conversionOrder.OutputPdfPath);
 			_checkForBrowserNavigatedTimer.Enabled = true;
 			Status = "Loading Html...";
@@ -164,7 +164,8 @@ namespace GeckofxHtmlToPdf
 					new PaperSize("halfletter", 139.7, 215.9),
 					new PaperSize("quarterletter", 107.95, 139.7),
 					new PaperSize("legal", 215.9, 355.6),
-					new PaperSize("halflegal", 177.8, 215.9)
+					new PaperSize("halflegal", 177.8, 215.9),
+					new PaperSize("device16x9", 100, 1600/9d)
 				};
 
 			var match =sizes.Find(s => s.Name == name);
@@ -235,7 +236,7 @@ namespace GeckofxHtmlToPdf
 
 			//TODO: doesn't seem to do anything. Probably a problem in the geckofx wrapper
 			//printSettings.SetScalingAttribute(_conversionOrder.Zoom);
-			
+
 			_printSettings.SetOutputFormatAttribute(2); // 2 == kOutputFormatPDF
 
 			Status = "Making PDF..";
@@ -280,7 +281,7 @@ namespace GeckofxHtmlToPdf
 						_currentFile, Environment.NewLine));
 				}
 				// collect all the memory we can between pages
-				GC.Collect(); 
+				GC.Collect();
 				GC.WaitForPendingFinalizers();
 				MemoryService.MinimizeHeap(true);
 				_browser.Window.WindowUtils.GarbageCollect(null /*hopefully nulls ok*/, 0);
