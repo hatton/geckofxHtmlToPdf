@@ -164,7 +164,8 @@ namespace GeckofxHtmlToPdf
 					new PaperSize("halfletter", 139.7, 215.9),
 					new PaperSize("quarterletter", 107.95, 139.7),
 					new PaperSize("legal", 215.9, 355.6),
-					new PaperSize("halflegal", 177.8, 215.9)
+					new PaperSize("halflegal", 177.8, 215.9),
+					new PaperSize("device16x9", 100, 1600/9d)
 				};
 
 			var match =sizes.Find(s => s.Name == name);
