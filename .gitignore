@@ -7,3 +7,4 @@ obj
 test/*.pdf
 *.suo
 .nuget/NuGet.exe
+/.vs
