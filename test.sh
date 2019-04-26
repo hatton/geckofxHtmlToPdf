@@ -13,7 +13,7 @@ export XULRUNNER=$(dirname $(find $tmpbasedir -name libxul.so | grep -v /package
 export LD_PRELOAD=$(find $tmpbasedir -name libgeckofix.so | grep -v /packages/)
 unset tmpbasedir
 
-export MONO_PATH="${BASE}/output/${BUILD}:/usr/lib/cli/gdk-sharp-2.0:${GECKOFX}"
+export MONO_PATH="${BASE}/output/${BUILD}:/usr/lib/cli/gdk-sharp-3.0:${GECKOFX}"
 export PATH="${MONO_PREFIX}/bin:${BASE}/output/${BUILD}:${PATH}"
 export LD_LIBRARY_PATH="${MONO_PREFIX}/lib:${XULRUNNER}:${BASE}/output/${BUILD}:${LD_LIBRARY_PATH}"
 export PKG_CONFIG_PATH="${MONO_PREFIX}/lib/pkgconfig:${PKG_CONFIG_PATH}:/usr/local/lib/pkgconfig:/lib/pkgconfig:/usr/lib/pkgconfig"
@@ -36,7 +36,7 @@ export HGRCPATH=
 #sets keyboard input method to none
 unset XMODIFIERS
 
-time /opt/mono4-sil/bin/mono --runtime=v4.0 --debug output/Debug/GeckofxHtmlToPdf.exe "${BASE}/test/letterSpacingTest.html" output/letterSpacingTest.pdf --report-memory >test.output
-time /opt/mono4-sil/bin/mono --runtime=v4.0 --debug output/Debug/GeckofxHtmlToPdf.exe "${BASE}/test/letterSpacingTest.html" output/letterSpacingTest-single.pdf --reduce-memory-use --report-memory >>test.output
-time /opt/mono4-sil/bin/mono --runtime=v4.0 --debug output/Debug/GeckofxHtmlToPdf.exe "${BASE}/test/Portable Document Format - Wikipedia.htm" output/pdf-wiki.pdf --report-memory >>test.output
-time /opt/mono4-sil/bin/mono --runtime=v4.0 --debug output/Debug/GeckofxHtmlToPdf.exe "${BASE}/test/Portable Document Format - Wikipedia.htm" output/pdf-wiki-single.pdf --reduce-memory-use --report-memory >>test.output
+time /opt/mono4-sil/bin/mono-sgen --runtime=v4.0 --debug output/Debug/GeckofxHtmlToPdf.exe "${BASE}/test/letterSpacingTest.html" output/letterSpacingTest.pdf --report-memory >test.output
+time /opt/mono4-sil/bin/mono-sgen --runtime=v4.0 --debug output/Debug/GeckofxHtmlToPdf.exe "${BASE}/test/letterSpacingTest.html" output/letterSpacingTest-single.pdf --reduce-memory-use --report-memory >>test.output
+time /opt/mono4-sil/bin/mono-sgen --runtime=v4.0 --debug output/Debug/GeckofxHtmlToPdf.exe "${BASE}/test/Portable Document Format - Wikipedia.htm" output/pdf-wiki.pdf --report-memory >>test.output
+time /opt/mono4-sil/bin/mono-sgen --runtime=v4.0 --debug output/Debug/GeckofxHtmlToPdf.exe "${BASE}/test/Portable Document Format - Wikipedia.htm" output/pdf-wiki-single.pdf --reduce-memory-use --report-memory >>test.output

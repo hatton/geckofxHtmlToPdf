@@ -284,7 +284,7 @@ namespace GeckofxHtmlToPdf
 				GC.Collect();
 				GC.WaitForPendingFinalizers();
 				MemoryService.MinimizeHeap(true);
-				_browser.Window.WindowUtils.GarbageCollect(null /*hopefully nulls ok*/, 0);
+				//not in Geckofx60: _browser.Window.WindowUtils.GarbageCollect(null /*hopefully nulls ok*/, 0);
 
 				var length = new FileInfo(_currentFile).Length;
 				if (IsPrintingFinished(length))

@@ -29,7 +29,7 @@ namespace GeckofxHtmlToPdf
 
 			var argsDefinition = Args.Configuration.Configure<ConversionOrder>();
 			argsDefinition.SwitchDelimiter = "-";
-			argsDefinition.CommandModelDescription = "GeckofxHtmlToPdf, using Xulrunner (Firefox) 45";
+			argsDefinition.CommandModelDescription = "GeckofxHtmlToPdf, using Xulrunner (Firefox) 60";
 
 			if (args.Length < 2 || (args.Length >0 && (new string[] {"-h", "/h","?", "/?", "-?", "help"}).Contains(args[1].ToLower())))
 			{
