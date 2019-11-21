@@ -61,11 +61,11 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Geckofx-Core, Version=60.0.43.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86" Condition="'$(OS)'=='Windows_NT'">
-      <HintPath>..\packages\Geckofx60.32.60.0.43\lib\net45\Geckofx-Core.dll</HintPath>
+    <Reference Include="Geckofx-Core, Version=60.0.44.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86" Condition="'$(OS)'=='Windows_NT'">
+      <HintPath>..\packages\Geckofx60.32.60.0.44\lib\net45\Geckofx-Core.dll</HintPath>
     </Reference>
-    <Reference Include="Geckofx-Winforms, Version=60.0.43.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86" Condition="'$(OS)'=='Windows_NT'">
-      <HintPath>..\packages\Geckofx60.32.60.0.43\lib\net45\Geckofx-Winforms.dll</HintPath>
+    <Reference Include="Geckofx-Winforms, Version=60.0.44.0, Culture=neutral, PublicKeyToken=3209ac31600d1857, processorArchitecture=x86" Condition="'$(OS)'=='Windows_NT'">
+      <HintPath>..\packages\Geckofx60.32.60.0.44\lib\net45\Geckofx-Winforms.dll</HintPath>
     </Reference>
     <!-- Linux is now 64-bit only in essence, so we can use HintPath for Geckofx60 assemblies -->
     <Reference Include="Geckofx-Core" Condition="'$(OS)'!='Windows_NT'">
@@ -152,7 +152,7 @@
     <!-- this cannot be done in BeforeBuild, because the nuget download occurs as part of Build after BeforeBuild -->
     <Exec Command="mkdir -p $(OutDir)" />
     <Exec Command="rm -rf $(OutDir)Firefox" />
-    <Exec Command="find $(SolutionDir)packages/Geckofx60.64.Linux.60.0.43 -name 'Geckofx-*.*' -exec cp -pvn '{}' $(OutDir) ';' &amp;&amp; find $(SolutionDir)packages/Geckofx60.64.Linux.60.0.43 -name Firefox* -type d -exec cp -pRvn '{}' $(OutDir)/Firefox ';'" />
+    <Exec Command="find $(SolutionDir)packages/Geckofx60.64.Linux.60.0.44 -name 'Geckofx-*.*' -exec cp -pvn '{}' $(OutDir) ';' &amp;&amp; find $(SolutionDir)packages/Geckofx60.64.Linux.60.0.44 -name Firefox* -type d -exec cp -pRvn '{}' $(OutDir)/Firefox ';'" />
   </Target>
   <PropertyGroup Condition="'$(OS)'=='Windows_NT'">
     <PostBuildEvent Condition="'$(VS100COMNTOOLS)'!=''">"$(VS100COMNTOOLS)..\..\VC\bin\editbin.exe" /largeaddressaware "$(TargetPath)"</PostBuildEvent>
@@ -165,12 +165,12 @@ IF  EXIST  "$(DevEnvDir)..\tools\vsdevcmd.bat"  (CALL  "$(DevEnvDir)..\tools\vsd
 
 editbin.exe /largeaddressaware "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\Geckofx60.32.60.0.43\build\Geckofx60.32.targets" Condition="Exists('..\packages\Geckofx60.32.60.0.43\build\Geckofx60.32.targets')" />
+  <Import Project="..\packages\Geckofx60.32.60.0.44\build\Geckofx60.32.targets" Condition="Exists('..\packages\Geckofx60.32.60.0.44\build\Geckofx60.32.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild" Condition="'$(OS)'=='Windows_NT'">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Geckofx60.32.60.0.43\build\Geckofx60.32.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Geckofx60.32.60.0.43\build\Geckofx60.32.targets'))" />
+    <Error Condition="!Exists('..\packages\Geckofx60.32.60.0.44\build\Geckofx60.32.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Geckofx60.32.60.0.44\build\Geckofx60.32.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
