@@ -373,10 +373,12 @@ namespace GeckofxHtmlToPdf
 			{
 				RaiseStatusChanged(new PdfMakingStatus() { percentage = (int)((float)i / (float)filenames.Count), statusLabel = Status });
 				var file = filenames[i];
-				PdfDocument inputDocument = PdfReader.Open(file, PdfDocumentOpenMode.Import);
-				System.Diagnostics.Debug.Assert(inputDocument.PageCount == 1);
-				PdfPage page = inputDocument.Pages[0];
-				outputDocument.AddPage(page);
+				using (PdfDocument inputDocument = PdfReader.Open(file, PdfDocumentOpenMode.Import))
+				{
+					System.Diagnostics.Debug.Assert(inputDocument.PageCount == 1);
+					PdfPage page = inputDocument.Pages[0];
+					outputDocument.AddPage(page);
+				}
 			}
 			outputDocument.Save(_conversionOrder.OutputPdfPath);
 			// remove the page files that are no longer needed
